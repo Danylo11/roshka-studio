@@ -307,9 +307,9 @@ async def create_inquiry(input: InquiryCreate, background_tasks: BackgroundTasks
 
 
 @api_router.get("/inquiries", response_model=List[Inquiry])
-async def get_inquiries():
-    """Get all inquiries (for admin purposes)"""
-    inquiries = await db.inquiries.find({}, {"_id": 0}).to_list(1000)
+async def get_inquiries(skip: int = 0, limit: int = 50):
+    """Get inquiries with pagination (for admin purposes)"""
+    inquiries = await db.inquiries.find({}, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
     for inquiry in inquiries:
         if isinstance(inquiry.get('timestamp'), str):
             inquiry['timestamp'] = datetime.fromisoformat(inquiry['timestamp'])
