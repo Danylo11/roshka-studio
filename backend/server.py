@@ -94,29 +94,38 @@ async def create_spreadsheet_if_needed(service):
     try:
         if not SPREADSHEET_ID:
             logger.warning("Spreadsheet ID not configured")
-            return False
-            
-        # Check if spreadsheet exists and has headers
-        result = service.spreadsheets().values().get(
-            spreadsheetId=SPREADSHEET_ID,
-            range='Sheet1!A1:G1'
-        ).execute()
+            return False, None
         
-        values = result.get('values', [])
-        if not values:
-            # Add headers
-            headers = [['Name', 'Email', 'Service Type', 'Project Description', 'Budget', 'Timeline', 'Timestamp']]
-            service.spreadsheets().values().update(
+        # Get spreadsheet metadata to find the first sheet name
+        spreadsheet = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
+        first_sheet_name = spreadsheet['sheets'][0]['properties']['title']
+        logger.info(f"Using sheet: {first_sheet_name}")
+            
+        # Check if spreadsheet has headers
+        try:
+            result = service.spreadsheets().values().get(
                 spreadsheetId=SPREADSHEET_ID,
-                range='Sheet1!A1:G1',
-                valueInputOption='RAW',
-                body={'values': headers}
+                range=f"'{first_sheet_name}'!A1:G1"
             ).execute()
-            logger.info("Created spreadsheet headers")
-        return True
+            
+            values = result.get('values', [])
+            if not values:
+                # Add headers
+                headers = [['Name', 'Email', 'Service Type', 'Project Description', 'Budget', 'Timeline', 'Timestamp']]
+                service.spreadsheets().values().update(
+                    spreadsheetId=SPREADSHEET_ID,
+                    range=f"'{first_sheet_name}'!A1:G1",
+                    valueInputOption='RAW',
+                    body={'values': headers}
+                ).execute()
+                logger.info("Created spreadsheet headers")
+        except Exception as e:
+            logger.warning(f"Could not check headers: {e}")
+            
+        return True, first_sheet_name
     except Exception as e:
-        logger.error(f"Error creating spreadsheet: {e}")
-        return False
+        logger.error(f"Error accessing spreadsheet: {e}")
+        return False, None
 
 
 async def append_to_sheets(inquiry: Inquiry):
@@ -126,7 +135,9 @@ async def append_to_sheets(inquiry: Inquiry):
         if not service:
             return False
             
-        await create_spreadsheet_if_needed(service)
+        success, sheet_name = await create_spreadsheet_if_needed(service)
+        if not success or not sheet_name:
+            return False
         
         row = [[
             inquiry.name,
@@ -140,7 +151,7 @@ async def append_to_sheets(inquiry: Inquiry):
         
         service.spreadsheets().values().append(
             spreadsheetId=SPREADSHEET_ID,
-            range='Sheet1!A:G',
+            range=f"'{sheet_name}'!A:G",
             valueInputOption='RAW',
             insertDataOption='INSERT_ROWS',
             body={'values': row}
