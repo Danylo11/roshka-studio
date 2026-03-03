@@ -16,14 +16,17 @@ import {
   Code,
   CheckCircle,
   Sparkles,
-  ChevronDown
+  ChevronDown,
+  Star,
+  Zap,
+  Award
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// Navigation Component
+// Navigation Component with Fixed Mobile Menu
 const Navbar = ({ activeSection }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -36,6 +39,18 @@ const Navbar = ({ activeSection }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   const navLinks = [
     { href: "#home", label: "Home" },
     { href: "#services", label: "Services" },
@@ -47,10 +62,12 @@ const Navbar = ({ activeSection }) => {
 
   const scrollToSection = (href) => {
     setIsOpen(false);
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    setTimeout(() => {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   return (
@@ -60,7 +77,7 @@ const Navbar = ({ activeSection }) => {
         animate={{ y: 0 }}
         transition={{ duration: 0.6 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled ? 'glass py-4' : 'py-6'
+          scrolled ? 'glass py-4' : 'py-6 bg-roshka-bg/80 backdrop-blur-sm'
         }`}
         data-testid="navbar"
       >
@@ -69,7 +86,7 @@ const Navbar = ({ activeSection }) => {
           <a 
             href="#home" 
             onClick={(e) => { e.preventDefault(); scrollToSection('#home'); }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 z-50"
             data-testid="logo"
           >
             <span className="font-heading text-2xl font-bold text-roshka-gold">ROSHKA</span>
@@ -106,58 +123,93 @@ const Navbar = ({ activeSection }) => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-roshka-text p-2"
+            className="md:hidden text-roshka-text p-2 z-50 relative"
             data-testid="mobile-menu-btn"
             aria-label="Toggle menu"
           >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+            <motion.div
+              initial={false}
+              animate={{ rotate: isOpen ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {isOpen ? <X size={28} className="text-roshka-gold" /> : <Menu size={28} />}
+            </motion.div>
           </button>
         </div>
       </motion.nav>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Overlay - FIXED */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="mobile-menu-overlay"
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-40 md:hidden"
             data-testid="mobile-menu"
           >
-            <button
+            {/* Background overlay */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-roshka-bg/98 backdrop-blur-xl"
               onClick={() => setIsOpen(false)}
-              className="absolute top-6 right-6 text-roshka-text p-2"
-              aria-label="Close menu"
-            >
-              <X size={28} />
-            </button>
-            <div className="flex flex-col items-center gap-8">
-              {navLinks.map((link, index) => (
+            />
+            
+            {/* Menu content */}
+            <div className="relative z-10 h-full flex flex-col items-center justify-center px-8">
+              {/* Decorative elements */}
+              <div className="absolute top-20 left-10 w-32 h-32 bg-roshka-gold/10 rounded-full blur-3xl" />
+              <div className="absolute bottom-20 right-10 w-40 h-40 bg-roshka-gold/5 rounded-full blur-3xl" />
+              
+              <nav className="flex flex-col items-center gap-6">
+                {navLinks.map((link, index) => (
+                  <motion.a
+                    key={link.href}
+                    href={link.href}
+                    onClick={(e) => { e.preventDefault(); scrollToSection(link.href); }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.4, delay: index * 0.08 }}
+                    className={`font-heading text-3xl sm:text-4xl transition-all duration-300 ${
+                      activeSection === link.href.slice(1)
+                        ? 'text-roshka-gold'
+                        : 'text-roshka-text hover:text-roshka-gold'
+                    }`}
+                    data-testid={`mobile-nav-${link.label.toLowerCase()}`}
+                  >
+                    {link.label}
+                  </motion.a>
+                ))}
+                
                 <motion.a
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => { e.preventDefault(); scrollToSection(link.href); }}
-                  initial={{ opacity: 0, y: 20 }}
+                  href="#contact"
+                  onClick={(e) => { e.preventDefault(); scrollToSection('#contact'); }}
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="font-heading text-3xl text-roshka-text hover:text-roshka-gold transition-colors"
-                  data-testid={`mobile-nav-${link.label.toLowerCase()}`}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4, delay: navLinks.length * 0.08 }}
+                  className="btn-gold text-lg mt-8 px-10 py-4"
+                  data-testid="mobile-start-project"
                 >
-                  {link.label}
+                  Start Your Project
                 </motion.a>
-              ))}
-              <motion.a
-                href="#contact"
-                onClick={(e) => { e.preventDefault(); scrollToSection('#contact'); }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="btn-gold text-lg mt-4"
-                data-testid="mobile-start-project"
+              </nav>
+              
+              {/* Bottom decoration */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="absolute bottom-12 text-center"
               >
-                Start Project
-              </motion.a>
+                <p className="font-mono text-xs text-roshka-gold/50 tracking-widest">
+                  SILVER SPRING, MD
+                </p>
+              </motion.div>
             </div>
           </motion.div>
         )}
@@ -166,7 +218,7 @@ const Navbar = ({ activeSection }) => {
   );
 };
 
-// Hero Section
+// Enhanced Hero Section
 const HeroSection = () => {
   const scrollToContact = () => {
     document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
@@ -179,161 +231,218 @@ const HeroSection = () => {
   return (
     <section 
       id="home" 
-      className="min-h-screen flex items-center justify-center relative overflow-hidden"
+      className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20"
       data-testid="hero-section"
     >
-      {/* Background */}
-      <div 
-        className="absolute inset-0 hero-bg"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=1920&q=80')`
-        }}
-      />
-      
-      {/* Abstract shapes */}
-      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-roshka-gold/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-roshka-gold/10 rounded-full blur-3xl" />
+      {/* Animated Background */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-roshka-bg" />
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-roshka-gold/5 rounded-full blur-[120px] animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-roshka-gold/8 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-roshka-gold/3 rounded-full blur-[150px]" />
+        </div>
+        {/* Grid pattern */}
+        <div className="absolute inset-0 opacity-[0.02]" style={{
+          backgroundImage: `linear-gradient(rgba(212, 175, 55, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(212, 175, 55, 0.3) 1px, transparent 1px)`,
+          backgroundSize: '100px 100px'
+        }} />
+      </div>
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 1, ease: "easeOut" }}
         >
-          <span className="font-mono text-xs text-roshka-gold tracking-[0.3em] uppercase mb-6 block">
+          <motion.span 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="inline-flex items-center gap-2 font-mono text-xs text-roshka-gold tracking-[0.3em] uppercase mb-8 px-4 py-2 rounded-full border border-roshka-gold/20 bg-roshka-gold/5"
+          >
+            <Star size={12} className="fill-roshka-gold" />
             Silver Spring, MD
-          </span>
+            <Star size={12} className="fill-roshka-gold" />
+          </motion.span>
           
-          <h1 className="font-heading text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold mb-8 leading-tight">
-            <span className="text-roshka-text">Crafting</span>
-            <br />
-            <span className="text-gold-gradient">Digital Legacies</span>
+          <h1 className="font-heading text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold mb-8 leading-[1.1]">
+            <motion.span 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="text-roshka-text block"
+            >
+              Crafting
+            </motion.span>
+            <motion.span 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="text-gold-gradient block"
+            >
+              Digital Legacies
+            </motion.span>
           </h1>
           
-          <p className="font-body text-roshka-text-secondary text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.8 }}
+            className="font-body text-roshka-text-secondary text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed"
+          >
             We design and develop modern websites that elevate your brand 
             and transform visitors into loyal clients.
-          </p>
+          </motion.p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9, duration: 0.6 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          >
             <button 
               onClick={scrollToPortfolio}
-              className="btn-outline flex items-center gap-2"
+              className="group btn-outline flex items-center gap-2 hover:bg-roshka-gold/10"
               data-testid="hero-view-work"
             >
               View Our Work
-              <ArrowRight size={18} />
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
             <button 
               onClick={scrollToContact}
-              className="btn-gold flex items-center gap-2"
+              className="group btn-gold flex items-center gap-2"
               data-testid="hero-start-project"
             >
-              Start Your Project
               <Sparkles size={18} />
+              Start Your Project
             </button>
-          </div>
+          </motion.div>
         </motion.div>
 
         {/* Scroll indicator */}
         <motion.div 
-          className="absolute bottom-12 left-1/2 -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 0.6 }}
         >
-          <ChevronDown size={32} className="text-roshka-gold/50" />
+          <motion.div
+            animate={{ y: [0, 12, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="flex flex-col items-center gap-2"
+          >
+            <span className="font-mono text-[10px] text-roshka-gold/50 tracking-widest">SCROLL</span>
+            <ChevronDown size={24} className="text-roshka-gold/50" />
+          </motion.div>
         </motion.div>
       </div>
     </section>
   );
 };
 
-// Services Section
+// Enhanced Services Section
 const ServicesSection = () => {
   const services = [
     {
       icon: Globe,
       title: "Business Website",
       description: "Custom-designed professional websites that elevate your brand and convert visitors into clients.",
-      features: ["Custom Design", "Mobile Responsive", "SEO Optimized"]
+      features: ["Custom Design", "Mobile Responsive", "SEO Optimized"],
+      gradient: "from-blue-500/20 to-purple-500/20"
     },
     {
       icon: Palette,
       title: "Landing Page",
       description: "High-converting landing pages designed to capture leads and drive specific actions.",
-      features: ["Conversion Focused", "A/B Testing Ready", "Fast Loading"]
+      features: ["Conversion Focused", "A/B Testing Ready", "Fast Loading"],
+      gradient: "from-pink-500/20 to-orange-500/20"
     },
     {
       icon: ShoppingCart,
       title: "E-commerce",
       description: "Full-featured online stores with secure payments and inventory management.",
-      features: ["Product Catalog", "Secure Checkout", "Order Management"]
+      features: ["Product Catalog", "Secure Checkout", "Order Management"],
+      gradient: "from-green-500/20 to-teal-500/20"
     },
     {
       icon: RefreshCw,
       title: "Website Redesign",
       description: "Transform your outdated website into a modern, high-performing digital experience.",
-      features: ["UX Audit", "Modern Design", "Performance Boost"]
+      features: ["UX Audit", "Modern Design", "Performance Boost"],
+      gradient: "from-yellow-500/20 to-red-500/20"
     },
     {
       icon: Code,
       title: "Custom Project",
       description: "Unique digital solutions tailored to your specific business needs and goals.",
-      features: ["Custom Features", "API Integration", "Full Support"]
+      features: ["Custom Features", "API Integration", "Full Support"],
+      gradient: "from-indigo-500/20 to-cyan-500/20"
     }
   ];
 
   return (
     <section id="services" className="py-24 md:py-32 relative" data-testid="services-section">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+      {/* Background decoration */}
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1/3 h-96 bg-roshka-gold/3 blur-[150px] rounded-full" />
+      
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
-          <span className="font-mono text-xs text-roshka-gold tracking-[0.3em] uppercase mb-4 block">
+          <span className="inline-flex items-center gap-2 font-mono text-xs text-roshka-gold tracking-[0.3em] uppercase mb-4 px-4 py-2 rounded-full border border-roshka-gold/20 bg-roshka-gold/5">
+            <Zap size={12} />
             What We Create
           </span>
-          <h2 className="font-heading text-4xl md:text-5xl font-bold text-roshka-text mb-6">
-            Our Services
+          <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-roshka-text mb-6">
+            Our <span className="text-gold-gradient">Services</span>
           </h2>
-          <p className="font-body text-roshka-text-secondary max-w-2xl mx-auto">
+          <p className="font-body text-roshka-text-secondary max-w-2xl mx-auto text-lg">
             From sleek business websites to complex e-commerce platforms, 
             we deliver digital solutions that drive results.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {services.map((service, index) => (
             <motion.div
               key={service.title}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="service-card glass rounded-xl p-8 group"
+              className="group relative"
               data-testid={`service-${service.title.toLowerCase().replace(/\s+/g, '-')}`}
             >
-              <div className="w-14 h-14 rounded-lg bg-roshka-gold/10 flex items-center justify-center mb-6 group-hover:bg-roshka-gold/20 transition-colors">
-                <service.icon size={28} className="text-roshka-gold" />
-              </div>
-              <h3 className="font-heading text-xl font-semibold text-roshka-text mb-3">
-                {service.title}
-              </h3>
-              <p className="font-body text-roshka-text-secondary text-sm mb-6 leading-relaxed">
-                {service.description}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {service.features.map((feature) => (
-                  <span 
-                    key={feature}
-                    className="text-xs font-body text-roshka-gold bg-roshka-gold/10 px-3 py-1 rounded-full"
-                  >
-                    {feature}
-                  </span>
-                ))}
+              <div className="service-card glass rounded-2xl p-8 h-full relative overflow-hidden">
+                {/* Hover gradient */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                
+                <div className="relative z-10">
+                  <div className="w-16 h-16 rounded-xl bg-roshka-gold/10 flex items-center justify-center mb-6 group-hover:bg-roshka-gold/20 group-hover:scale-110 transition-all duration-500">
+                    <service.icon size={32} className="text-roshka-gold" />
+                  </div>
+                  <h3 className="font-heading text-2xl font-semibold text-roshka-text mb-4">
+                    {service.title}
+                  </h3>
+                  <p className="font-body text-roshka-text-secondary mb-6 leading-relaxed">
+                    {service.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {service.features.map((feature) => (
+                      <span 
+                        key={feature}
+                        className="text-xs font-body text-roshka-gold bg-roshka-gold/10 px-3 py-1.5 rounded-full group-hover:bg-roshka-gold/20 transition-colors"
+                      >
+                        {feature}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             </motion.div>
           ))}
@@ -343,73 +452,107 @@ const ServicesSection = () => {
   );
 };
 
-// About Section
+// Enhanced About Section
 const AboutSection = () => {
+  const stats = [
+    { number: "50+", label: "Projects Completed", icon: Award },
+    { number: "100%", label: "Client Satisfaction", icon: Star },
+    { number: "5+", label: "Years Experience", icon: Zap },
+    { number: "24/7", label: "Support Available", icon: CheckCircle }
+  ];
+
   return (
-    <section id="about" className="py-24 md:py-32 relative" data-testid="about-section">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+    <section id="about" className="py-24 md:py-32 relative overflow-hidden" data-testid="about-section">
+      {/* Background elements */}
+      <div className="absolute right-0 top-0 w-1/2 h-full bg-roshka-gold/3 blur-[200px] rounded-full" />
+      
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative">
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
           >
-            <span className="font-mono text-xs text-roshka-gold tracking-[0.3em] uppercase mb-4 block">
+            <span className="inline-flex items-center gap-2 font-mono text-xs text-roshka-gold tracking-[0.3em] uppercase mb-4 px-4 py-2 rounded-full border border-roshka-gold/20 bg-roshka-gold/5">
+              <Sparkles size={12} />
               About Us
             </span>
-            <h2 className="font-heading text-4xl md:text-5xl font-bold text-roshka-text mb-6">
+            <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-roshka-text mb-8 leading-tight">
               We Build Digital <span className="text-gold-gradient">Experiences</span>
             </h2>
-            <p className="font-body text-roshka-text-secondary mb-6 leading-relaxed">
+            <p className="font-body text-roshka-text-secondary mb-6 text-lg leading-relaxed">
               ROSHKA STUDIO is a creative web studio based in Silver Spring, MD. 
               We specialize in designing and developing modern websites that help 
               businesses stand out in the digital landscape.
             </p>
-            <p className="font-body text-roshka-text-secondary mb-8 leading-relaxed">
+            <p className="font-body text-roshka-text-secondary mb-10 text-lg leading-relaxed">
               Our approach combines innovative design thinking with cutting-edge 
               technology to create websites that are not just beautiful, but also 
               highly functional and conversion-focused.
             </p>
             
-            <div className="grid grid-cols-2 gap-6">
-              {[
-                { number: "50+", label: "Projects Completed" },
-                { number: "100%", label: "Client Satisfaction" },
-                { number: "5+", label: "Years Experience" },
-                { number: "24/7", label: "Support Available" }
-              ].map((stat) => (
-                <div key={stat.label} className="glass rounded-lg p-4">
+            <div className="grid grid-cols-2 gap-4">
+              {stats.map((stat, index) => (
+                <motion.div 
+                  key={stat.label} 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="glass rounded-xl p-5 group hover:bg-roshka-gold/5 transition-colors"
+                >
+                  <stat.icon size={20} className="text-roshka-gold mb-2" />
                   <div className="font-heading text-3xl font-bold text-roshka-gold mb-1">
                     {stat.number}
                   </div>
                   <div className="font-body text-sm text-roshka-text-secondary">
                     {stat.label}
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
             className="relative"
           >
-            <div className="aspect-[4/3] rounded-2xl overflow-hidden">
-              <img 
-                src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80"
-                alt="Modern creative studio workspace"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="absolute -bottom-8 -left-8 glass rounded-xl p-6 max-w-xs">
-              <Sparkles size={24} className="text-roshka-gold mb-2" />
-              <p className="font-body text-sm text-roshka-text">
-                "Innovation and creativity drive every project we undertake."
-              </p>
+            <div className="relative">
+              {/* Main image */}
+              <div className="aspect-[4/5] rounded-3xl overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80"
+                  alt="Modern creative studio workspace"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-roshka-bg via-transparent to-transparent" />
+              </div>
+              
+              {/* Floating card */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="absolute -bottom-6 -left-6 glass rounded-2xl p-6 max-w-xs shadow-glow"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-full bg-roshka-gold/20 flex items-center justify-center">
+                    <Sparkles size={20} className="text-roshka-gold" />
+                  </div>
+                  <span className="font-mono text-xs text-roshka-gold tracking-wider">OUR PHILOSOPHY</span>
+                </div>
+                <p className="font-body text-sm text-roshka-text leading-relaxed">
+                  "Innovation and creativity drive every project we undertake."
+                </p>
+              </motion.div>
+              
+              {/* Decorative border */}
+              <div className="absolute -inset-4 border border-roshka-gold/10 rounded-3xl -z-10" />
             </div>
           </motion.div>
         </div>
@@ -418,28 +561,32 @@ const AboutSection = () => {
   );
 };
 
-// Portfolio Section
+// Enhanced Portfolio Section
 const PortfolioSection = () => {
   const portfolioItems = [
     {
       title: "Your Project Here",
       category: "Business Website",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80"
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
+      size: "large"
     },
     {
       title: "Your Project Here",
       category: "E-commerce",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80"
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
+      size: "small"
     },
     {
       title: "Your Project Here",
       category: "Landing Page",
-      image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=600&q=80"
+      image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=600&q=80",
+      size: "small"
     },
     {
       title: "Your Project Here",
       category: "Custom Project",
-      image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600&q=80"
+      image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600&q=80",
+      size: "large"
     }
   ];
 
@@ -451,28 +598,34 @@ const PortfolioSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
-          <span className="font-mono text-xs text-roshka-gold tracking-[0.3em] uppercase mb-4 block">
+          <span className="inline-flex items-center gap-2 font-mono text-xs text-roshka-gold tracking-[0.3em] uppercase mb-4 px-4 py-2 rounded-full border border-roshka-gold/20 bg-roshka-gold/5">
+            <Award size={12} />
             Our Work
           </span>
-          <h2 className="font-heading text-4xl md:text-5xl font-bold text-roshka-text mb-6">
-            Portfolio
+          <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-roshka-text mb-6">
+            <span className="text-gold-gradient">Portfolio</span>
           </h2>
-          <p className="font-body text-roshka-text-secondary max-w-2xl mx-auto">
+          <p className="font-body text-roshka-text-secondary max-w-2xl mx-auto text-lg">
             Explore our latest projects. Your project could be featured here next.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        {/* Bento Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {portfolioItems.map((item, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group relative aspect-[16/10] rounded-xl overflow-hidden cursor-pointer"
+              className={`group relative rounded-2xl overflow-hidden cursor-pointer ${
+                index === 0 ? 'md:col-span-2 aspect-[16/9]' : 
+                index === 3 ? 'lg:col-span-2 aspect-[16/9]' : 
+                'aspect-square'
+              }`}
               data-testid={`portfolio-item-${index}`}
             >
               <img 
@@ -480,15 +633,23 @@ const PortfolioSection = () => {
                 alt={item.title}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-roshka-bg via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                <span className="font-mono text-xs text-roshka-gold uppercase tracking-wider">
-                  {item.category}
-                </span>
-                <h3 className="font-heading text-xl text-roshka-text mt-2">
-                  {item.title}
-                </h3>
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-roshka-bg via-roshka-bg/50 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
+              
+              {/* Content */}
+              <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                  <span className="inline-block font-mono text-xs text-roshka-gold uppercase tracking-wider mb-2 px-3 py-1 rounded-full bg-roshka-gold/20">
+                    {item.category}
+                  </span>
+                  <h3 className="font-heading text-2xl text-roshka-text">
+                    {item.title}
+                  </h3>
+                </div>
               </div>
+              
+              {/* Hover border */}
+              <div className="absolute inset-0 border-2 border-roshka-gold/0 group-hover:border-roshka-gold/30 rounded-2xl transition-colors duration-500" />
             </motion.div>
           ))}
         </div>
@@ -498,9 +659,9 @@ const PortfolioSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-center mt-12"
+          className="text-center mt-16"
         >
-          <p className="font-body text-roshka-text-secondary mb-4">
+          <p className="font-body text-roshka-text-secondary mb-6 text-lg">
             Want your project featured here?
           </p>
           <a
@@ -521,77 +682,88 @@ const PortfolioSection = () => {
   );
 };
 
-// Process Section
+// Enhanced Process Section
 const ProcessSection = () => {
   const steps = [
     {
       number: "01",
       title: "Discovery",
-      description: "We start by understanding your business, goals, and target audience to create a tailored strategy."
+      description: "We start by understanding your business, goals, and target audience to create a tailored strategy.",
+      icon: "🔍"
     },
     {
       number: "02",
       title: "Design",
-      description: "Our designers create stunning mockups that capture your brand essence and user experience."
+      description: "Our designers create stunning mockups that capture your brand essence and user experience.",
+      icon: "🎨"
     },
     {
       number: "03",
       title: "Development",
-      description: "We build your website using modern technologies ensuring speed, security, and scalability."
+      description: "We build your website using modern technologies ensuring speed, security, and scalability.",
+      icon: "⚡"
     },
     {
       number: "04",
       title: "Launch",
-      description: "After thorough testing, we launch your website and provide ongoing support and maintenance."
+      description: "After thorough testing, we launch your website and provide ongoing support and maintenance.",
+      icon: "🚀"
     }
   ];
 
   return (
-    <section id="process" className="py-24 md:py-32 relative" data-testid="process-section">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <section id="process" className="py-24 md:py-32 relative overflow-hidden" data-testid="process-section">
+      {/* Background */}
+      <div className="absolute inset-0 bg-roshka-surface/50" />
+      <div className="absolute left-1/2 top-0 -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-roshka-gold/20 to-transparent" />
+      
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
-          <span className="font-mono text-xs text-roshka-gold tracking-[0.3em] uppercase mb-4 block">
+          <span className="inline-flex items-center gap-2 font-mono text-xs text-roshka-gold tracking-[0.3em] uppercase mb-4 px-4 py-2 rounded-full border border-roshka-gold/20 bg-roshka-gold/5">
+            <Zap size={12} />
             How We Work
           </span>
-          <h2 className="font-heading text-4xl md:text-5xl font-bold text-roshka-text mb-6">
-            Our Process
+          <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-roshka-text mb-6">
+            Our <span className="text-gold-gradient">Process</span>
           </h2>
-          <p className="font-body text-roshka-text-secondary max-w-2xl mx-auto">
+          <p className="font-body text-roshka-text-secondary max-w-2xl mx-auto text-lg">
             A streamlined approach to bringing your digital vision to life.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
+          {/* Connecting line */}
+          <div className="hidden lg:block absolute top-24 left-[12%] right-[12%] h-0.5 bg-gradient-to-r from-roshka-gold/20 via-roshka-gold/40 to-roshka-gold/20" />
+          
           {steps.map((step, index) => (
             <motion.div
               key={step.number}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
               className="relative"
               data-testid={`process-step-${index + 1}`}
             >
-              <div className="glass rounded-xl p-8 h-full relative z-10">
-                <span className="font-mono text-4xl font-bold text-roshka-gold/20 mb-4 block">
-                  {step.number}
-                </span>
-                <h3 className="font-heading text-xl font-semibold text-roshka-text mb-3">
+              <div className="glass rounded-2xl p-8 h-full relative group hover:bg-roshka-gold/5 transition-colors duration-500">
+                {/* Step number circle */}
+                <div className="w-12 h-12 rounded-full bg-roshka-gold/20 flex items-center justify-center mb-6 mx-auto lg:mx-0 group-hover:bg-roshka-gold group-hover:text-roshka-bg transition-all duration-500">
+                  <span className="font-mono text-lg font-bold text-roshka-gold group-hover:text-roshka-bg">{step.number}</span>
+                </div>
+                
+                <h3 className="font-heading text-2xl font-semibold text-roshka-text mb-4 text-center lg:text-left">
                   {step.title}
                 </h3>
-                <p className="font-body text-sm text-roshka-text-secondary leading-relaxed">
+                <p className="font-body text-roshka-text-secondary leading-relaxed text-center lg:text-left">
                   {step.description}
                 </p>
               </div>
-              {index < steps.length - 1 && (
-                <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-px bg-roshka-gold/30 z-0" />
-              )}
             </motion.div>
           ))}
         </div>
@@ -600,7 +772,7 @@ const ProcessSection = () => {
   );
 };
 
-// Contact Section with Form
+// Enhanced Contact Section
 const ContactSection = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -644,67 +816,78 @@ const ContactSection = () => {
 
   return (
     <section id="contact" className="py-24 md:py-32 relative" data-testid="contact-section">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="grid lg:grid-cols-2 gap-16">
+      {/* Background */}
+      <div className="absolute right-0 bottom-0 w-1/2 h-1/2 bg-roshka-gold/5 blur-[200px] rounded-full" />
+      
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative">
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
           >
-            <span className="font-mono text-xs text-roshka-gold tracking-[0.3em] uppercase mb-4 block">
+            <span className="inline-flex items-center gap-2 font-mono text-xs text-roshka-gold tracking-[0.3em] uppercase mb-4 px-4 py-2 rounded-full border border-roshka-gold/20 bg-roshka-gold/5">
+              <Mail size={12} />
               Get In Touch
             </span>
-            <h2 className="font-heading text-4xl md:text-5xl font-bold text-roshka-text mb-6">
+            <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-roshka-text mb-8 leading-tight">
               Let's Create Something <span className="text-gold-gradient">Amazing</span>
             </h2>
-            <p className="font-body text-roshka-text-secondary mb-8 leading-relaxed">
+            <p className="font-body text-roshka-text-secondary mb-10 text-lg leading-relaxed">
               Ready to transform your digital presence? Fill out the form and we'll 
               get back to you within 24 hours to discuss your project.
             </p>
 
             <div className="space-y-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-roshka-gold/10 flex items-center justify-center">
-                  <Mail size={20} className="text-roshka-gold" />
+              <motion.a 
+                href="mailto:ogrisko54@gmail.com"
+                className="flex items-center gap-4 group"
+                whileHover={{ x: 5 }}
+                data-testid="contact-email"
+              >
+                <div className="w-14 h-14 rounded-xl bg-roshka-gold/10 flex items-center justify-center group-hover:bg-roshka-gold/20 transition-colors">
+                  <Mail size={24} className="text-roshka-gold" />
                 </div>
                 <div>
-                  <div className="font-body text-sm text-roshka-text-secondary">Email</div>
-                  <a 
-                    href="mailto:ogrisko54@gmail.com" 
-                    className="font-body text-roshka-text hover:text-roshka-gold transition-colors"
-                    data-testid="contact-email"
-                  >
+                  <div className="font-body text-sm text-roshka-text-secondary mb-1">Email</div>
+                  <span className="font-body text-lg text-roshka-text group-hover:text-roshka-gold transition-colors">
                     ogrisko54@gmail.com
-                  </a>
+                  </span>
                 </div>
-              </div>
+              </motion.a>
 
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-roshka-gold/10 flex items-center justify-center">
-                  <MapPin size={20} className="text-roshka-gold" />
+                <div className="w-14 h-14 rounded-xl bg-roshka-gold/10 flex items-center justify-center">
+                  <MapPin size={24} className="text-roshka-gold" />
                 </div>
                 <div>
-                  <div className="font-body text-sm text-roshka-text-secondary">Location</div>
-                  <span className="font-body text-roshka-text">Silver Spring, MD</span>
+                  <div className="font-body text-sm text-roshka-text-secondary mb-1">Location</div>
+                  <span className="font-body text-lg text-roshka-text">Silver Spring, MD</span>
                 </div>
               </div>
             </div>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
           >
             {submitted ? (
-              <div className="glass rounded-xl p-12 text-center">
-                <CheckCircle size={64} className="text-roshka-gold mx-auto mb-6" />
-                <h3 className="font-heading text-2xl font-bold text-roshka-text mb-4">
+              <div className="glass rounded-3xl p-12 text-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", duration: 0.5 }}
+                >
+                  <CheckCircle size={80} className="text-roshka-gold mx-auto mb-6" />
+                </motion.div>
+                <h3 className="font-heading text-3xl font-bold text-roshka-text mb-4">
                   Thank You!
                 </h3>
-                <p className="font-body text-roshka-text-secondary mb-6">
+                <p className="font-body text-roshka-text-secondary mb-8 text-lg">
                   Your inquiry has been received. We'll get back to you within 24 hours.
                 </p>
                 <button
@@ -716,7 +899,7 @@ const ContactSection = () => {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="glass rounded-xl p-8" data-testid="contact-form">
+              <form onSubmit={handleSubmit} className="glass rounded-3xl p-8 md:p-10" data-testid="contact-form">
                 <div className="grid gap-6">
                   <div>
                     <label className="font-body text-sm text-roshka-text-secondary mb-2 block">
@@ -830,20 +1013,23 @@ const ContactSection = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="btn-gold w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn-gold w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed py-4 text-lg"
                     data-testid="submit-btn"
                   >
                     {isSubmitting ? (
                       <>
-                        <span className="animate-spin">
-                          <RefreshCw size={18} />
-                        </span>
+                        <motion.span
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        >
+                          <RefreshCw size={20} />
+                        </motion.span>
                         Sending...
                       </>
                     ) : (
                       <>
                         Send Inquiry
-                        <ArrowRight size={18} />
+                        <ArrowRight size={20} />
                       </>
                     )}
                   </button>
@@ -857,17 +1043,18 @@ const ContactSection = () => {
   );
 };
 
-// Footer
+// Enhanced Footer
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="py-12 border-t border-white/5" data-testid="footer">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+    <footer className="py-16 border-t border-white/5 relative" data-testid="footer">
+      <div className="absolute inset-0 bg-roshka-surface/30" />
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-2">
-            <span className="font-heading text-xl font-bold text-roshka-gold">ROSHKA</span>
-            <span className="font-heading text-xl font-light text-roshka-text">STUDIO</span>
+            <span className="font-heading text-2xl font-bold text-roshka-gold">ROSHKA</span>
+            <span className="font-heading text-2xl font-light text-roshka-text">STUDIO</span>
           </div>
 
           <div className="flex items-center gap-6">
@@ -875,19 +1062,19 @@ const Footer = () => {
               href="https://github.com" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-roshka-text-secondary hover:text-roshka-gold transition-colors"
+              className="w-12 h-12 rounded-full bg-roshka-gold/10 flex items-center justify-center hover:bg-roshka-gold/20 transition-colors"
               data-testid="footer-github"
               aria-label="GitHub"
             >
-              <Github size={20} />
+              <Github size={20} className="text-roshka-gold" />
             </a>
             <a 
               href="mailto:ogrisko54@gmail.com"
-              className="text-roshka-text-secondary hover:text-roshka-gold transition-colors"
+              className="w-12 h-12 rounded-full bg-roshka-gold/10 flex items-center justify-center hover:bg-roshka-gold/20 transition-colors"
               data-testid="footer-email"
               aria-label="Email"
             >
-              <Mail size={20} />
+              <Mail size={20} className="text-roshka-gold" />
             </a>
           </div>
 
