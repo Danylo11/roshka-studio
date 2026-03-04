@@ -244,6 +244,83 @@ async def send_email_via_resend(inquiry: Inquiry):
         return False
 
 
+async def send_thank_you_email(inquiry: Inquiry):
+    """Send thank you email to the client"""
+    try:
+        if not RESEND_API_KEY:
+            logger.warning("Resend API key not configured")
+            return False
+        
+        html_content = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; background-color: #050505; color: #F5F5F5; padding: 20px; margin: 0;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #0A0A0A; border-radius: 12px; padding: 40px; border: 1px solid #D4AF37;">
+                <h1 style="color: #D4AF37; text-align: center; margin-top: 0; font-size: 32px;">ROSHKA STUDIO</h1>
+                <p style="text-align: center; color: #A3A3A3; margin-bottom: 30px; font-size: 14px;">Creative Web Studio</p>
+                
+                <hr style="border: none; border-top: 1px solid #D4AF37; margin: 20px 0;">
+                
+                <h2 style="color: #F5F5F5; text-align: center; font-size: 24px; margin-bottom: 20px;">Thank You, {inquiry.name}!</h2>
+                
+                <p style="color: #A3A3A3; line-height: 1.8; text-align: center; font-size: 16px;">
+                    We have received your project inquiry and we're excited to learn more about your vision!
+                </p>
+                
+                <div style="background: rgba(212, 175, 55, 0.1); border-radius: 12px; padding: 25px; margin: 30px 0; border: 1px solid rgba(212, 175, 55, 0.3);">
+                    <h3 style="color: #D4AF37; margin-top: 0; font-size: 18px;">Your Request Summary:</h3>
+                    <p style="color: #F5F5F5; margin: 10px 0;"><strong>Service:</strong> {inquiry.service_type}</p>
+                    <p style="color: #F5F5F5; margin: 10px 0;"><strong>Budget:</strong> {inquiry.budget or 'To be discussed'}</p>
+                    <p style="color: #F5F5F5; margin: 10px 0;"><strong>Timeline:</strong> {inquiry.timeline or 'Flexible'}</p>
+                </div>
+                
+                <p style="color: #A3A3A3; line-height: 1.8; text-align: center; font-size: 16px;">
+                    Our team will review your request and get back to you within <strong style="color: #D4AF37;">24 hours</strong>.
+                </p>
+                
+                <div style="text-align: center; margin: 35px 0;">
+                    <a href="mailto:ogrisko54@gmail.com" style="display: inline-block; background: linear-gradient(135deg, #D4AF37 0%, #F6E27A 50%, #B8860B 100%); color: #050505; padding: 15px 35px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Contact Us Directly</a>
+                </div>
+                
+                <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0 20px;">
+                
+                <p style="text-align: center; color: #A3A3A3; font-size: 12px; margin-bottom: 5px;">
+                    ROSHKA STUDIO | Silver Spring, MD
+                </p>
+                <p style="text-align: center; color: #A3A3A3; font-size: 12px; margin-bottom: 0;">
+                    ogrisko54@gmail.com
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {RESEND_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "from": "ROSHKA STUDIO <onboarding@resend.dev>",
+                    "to": [inquiry.email],
+                    "subject": f"Thank You for Your Inquiry - ROSHKA STUDIO",
+                    "html": html_content
+                }
+            )
+            
+            if response.status_code == 200:
+                logger.info(f"Thank you email sent to client: {inquiry.email}")
+                return True
+            else:
+                logger.error(f"Failed to send thank you email: {response.status_code} - {response.text}")
+                return False
+                
+    except Exception as e:
+        logger.error(f"Failed to send thank you email: {e}")
+        return False
+
+
 # API Routes
 @api_router.get("/")
 async def root():
@@ -271,6 +348,7 @@ async def create_inquiry(input: InquiryCreate, background_tasks: BackgroundTasks
         # Add background tasks for Google Sheets and email
         background_tasks.add_task(append_to_sheets, inquiry)
         background_tasks.add_task(send_email_via_resend, inquiry)
+        background_tasks.add_task(send_thank_you_email, inquiry)
         
         logger.info(f"New inquiry created: {inquiry.id}")
         return inquiry
