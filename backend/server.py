@@ -32,9 +32,8 @@ api_router = APIRouter(prefix="/api")
 GOOGLE_SHEETS_CREDENTIALS = os.environ.get('GOOGLE_SHEETS_CREDENTIALS', '')
 SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID', '')
 
-# Gmail configuration
-GMAIL_EMAIL = os.environ.get('GMAIL_EMAIL', '')
-GMAIL_APP_PASSWORD = os.environ.get('GMAIL_APP_PASSWORD', '')
+# Resend API configuration
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
 NOTIFICATION_EMAIL = os.environ.get('NOTIFICATION_EMAIL', 'ogrisko54@gmail.com')
 
 # Configure logging
@@ -70,9 +69,12 @@ class Inquiry(BaseModel):
 
 def fix_private_key(private_key: str) -> str:
     """Fix private key by ensuring proper newlines"""
-    # Replace escaped newlines with actual newlines
+    # If the key has literal \n (escaped), replace with actual newlines
     if '\\n' in private_key:
         private_key = private_key.replace('\\n', '\n')
+    # Also handle case where it might be double-escaped
+    if '\\\\n' in private_key:
+        private_key = private_key.replace('\\\\n', '\n')
     return private_key
 
 
@@ -83,19 +85,24 @@ def get_sheets_service():
             logger.warning("Google Sheets credentials not configured")
             return None
         
+        logger.info(f"Parsing Google Sheets credentials (length: {len(GOOGLE_SHEETS_CREDENTIALS)})")
+        
         # Parse JSON credentials
         creds_dict = json.loads(GOOGLE_SHEETS_CREDENTIALS)
         
         # Fix private key newlines
         if 'private_key' in creds_dict:
-            creds_dict['private_key'] = fix_private_key(creds_dict['private_key'])
-            logger.info("Fixed private key newlines")
+            original_key = creds_dict['private_key']
+            creds_dict['private_key'] = fix_private_key(original_key)
+            if original_key != creds_dict['private_key']:
+                logger.info("Fixed private key newlines")
         
         credentials = service_account.Credentials.from_service_account_info(
             creds_dict,
             scopes=['https://www.googleapis.com/auth/spreadsheets']
         )
         service = build('sheets', 'v4', credentials=credentials, cache_discovery=False)
+        logger.info("Google Sheets service created successfully")
         return service
     except json.JSONDecodeError as e:
         logger.error(f"Invalid JSON in credentials: {e}")
@@ -105,57 +112,26 @@ def get_sheets_service():
         return None
 
 
-async def create_spreadsheet_if_needed(service):
-    """Create spreadsheet and header row if it doesn't exist"""
-    try:
-        if not SPREADSHEET_ID:
-            logger.warning("Spreadsheet ID not configured")
-            return False, None
-        
-        # Get spreadsheet metadata to find the first sheet name
-        spreadsheet = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
-        first_sheet_name = spreadsheet['sheets'][0]['properties']['title']
-        logger.info(f"Using sheet: {first_sheet_name}")
-            
-        # Check if spreadsheet has headers
-        try:
-            result = service.spreadsheets().values().get(
-                spreadsheetId=SPREADSHEET_ID,
-                range=f"'{first_sheet_name}'!A1:G1"
-            ).execute()
-            
-            values = result.get('values', [])
-            if not values:
-                # Add headers
-                headers = [['Name', 'Email', 'Service Type', 'Project Description', 'Budget', 'Timeline', 'Timestamp']]
-                service.spreadsheets().values().update(
-                    spreadsheetId=SPREADSHEET_ID,
-                    range=f"'{first_sheet_name}'!A1:G1",
-                    valueInputOption='RAW',
-                    body={'values': headers}
-                ).execute()
-                logger.info("Created spreadsheet headers")
-        except Exception as e:
-            logger.warning(f"Could not check headers: {e}")
-            
-        return True, first_sheet_name
-    except Exception as e:
-        logger.error(f"Error accessing spreadsheet: {e}")
-        return False, None
-
-
 async def append_to_sheets(inquiry: Inquiry):
     """Append inquiry data to Google Sheets"""
     try:
+        if not SPREADSHEET_ID:
+            logger.warning("Spreadsheet ID not configured")
+            return False
+            
         service = get_sheets_service()
         if not service:
             logger.error("Could not create Sheets service")
             return False
-            
-        success, sheet_name = await create_spreadsheet_if_needed(service)
-        if not success or not sheet_name:
-            logger.error("Could not access spreadsheet")
-            return False
+        
+        # Get first sheet name
+        try:
+            spreadsheet = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
+            sheet_name = spreadsheet['sheets'][0]['properties']['title']
+            logger.info(f"Using sheet: {sheet_name}")
+        except Exception as e:
+            logger.error(f"Could not get sheet name: {e}")
+            sheet_name = "Лист1"  # Default Russian name
         
         row = [[
             inquiry.name,
@@ -167,7 +143,7 @@ async def append_to_sheets(inquiry: Inquiry):
             inquiry.timestamp.isoformat()
         ]]
         
-        service.spreadsheets().values().append(
+        result = service.spreadsheets().values().append(
             spreadsheetId=SPREADSHEET_ID,
             range=f"'{sheet_name}'!A:G",
             valueInputOption='RAW',
@@ -175,100 +151,96 @@ async def append_to_sheets(inquiry: Inquiry):
             body={'values': row}
         ).execute()
         
-        logger.info(f"Added inquiry to Google Sheets: {inquiry.id}")
+        logger.info(f"Added inquiry to Google Sheets: {inquiry.id}, result: {result.get('updates', {}).get('updatedRows', 0)} rows")
         return True
     except Exception as e:
         logger.error(f"Failed to append to sheets: {e}")
         return False
 
 
-async def send_email_notification(inquiry: Inquiry):
-    """Send email notification via Web3Forms (free, no SMTP needed)"""
+async def send_email_via_resend(inquiry: Inquiry):
+    """Send email notification via Resend API"""
     try:
-        # Use Web3Forms free email API (no API key needed for basic use)
-        # Or use a simple webhook notification
-        
-        # For now, log the notification (email will be sent when proper service is configured)
-        logger.info(f"Email notification would be sent for inquiry: {inquiry.id}")
-        logger.info(f"To: {NOTIFICATION_EMAIL}")
-        logger.info(f"Subject: New Project Inquiry from {inquiry.name}")
-        
-        # Try using Gmail SMTP over TLS (port 587) as fallback
-        try:
-            import smtplib
-            from email.mime.text import MIMEText
-            from email.mime.multipart import MIMEMultipart
-            
-            if not GMAIL_EMAIL or not GMAIL_APP_PASSWORD:
-                logger.warning("Gmail credentials not configured")
-                return False
-            
-            msg = MIMEMultipart('alternative')
-            msg['Subject'] = f'New Project Inquiry from {inquiry.name} - ROSHKA STUDIO'
-            msg['From'] = GMAIL_EMAIL
-            msg['To'] = NOTIFICATION_EMAIL
-            
-            html_content = f"""
-            <html>
-            <body style="font-family: Arial, sans-serif; background-color: #050505; color: #F5F5F5; padding: 20px;">
-                <div style="max-width: 600px; margin: 0 auto; background-color: #0A0A0A; border-radius: 12px; padding: 30px; border: 1px solid #D4AF37;">
-                    <h1 style="color: #D4AF37; text-align: center;">ROSHKA STUDIO</h1>
-                    <p style="text-align: center; color: #A3A3A3;">New Project Inquiry</p>
-                    <hr style="border-color: #D4AF37;">
-                    <p><strong style="color: #D4AF37;">Name:</strong> {inquiry.name}</p>
-                    <p><strong style="color: #D4AF37;">Email:</strong> {inquiry.email}</p>
-                    <p><strong style="color: #D4AF37;">Service:</strong> {inquiry.service_type}</p>
-                    <p><strong style="color: #D4AF37;">Description:</strong> {inquiry.project_description}</p>
-                    <p><strong style="color: #D4AF37;">Budget:</strong> {inquiry.budget or 'Not specified'}</p>
-                    <p><strong style="color: #D4AF37;">Timeline:</strong> {inquiry.timeline or 'Not specified'}</p>
-                    <p><strong style="color: #D4AF37;">Date:</strong> {inquiry.timestamp.strftime('%B %d, %Y at %I:%M %p UTC')}</p>
-                </div>
-            </body>
-            </html>
-            """
-            
-            text_content = f"""
-            New Project Inquiry - ROSHKA STUDIO
-            
-            Name: {inquiry.name}
-            Email: {inquiry.email}
-            Service: {inquiry.service_type}
-            Description: {inquiry.project_description}
-            Budget: {inquiry.budget or 'Not specified'}
-            Timeline: {inquiry.timeline or 'Not specified'}
-            Date: {inquiry.timestamp.isoformat()}
-            """
-            
-            msg.attach(MIMEText(text_content, 'plain'))
-            msg.attach(MIMEText(html_content, 'html'))
-            
-            # Try TLS on port 587 first (more likely to work)
-            try:
-                with smtplib.SMTP('smtp.gmail.com', 587, timeout=10) as server:
-                    server.starttls()
-                    server.login(GMAIL_EMAIL, GMAIL_APP_PASSWORD)
-                    server.sendmail(GMAIL_EMAIL, NOTIFICATION_EMAIL, msg.as_string())
-                logger.info(f"Email sent successfully via TLS for inquiry: {inquiry.id}")
-                return True
-            except Exception as e1:
-                logger.warning(f"TLS failed: {e1}, trying SSL...")
-                # Try SSL on port 465 as fallback
-                try:
-                    with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=10) as server:
-                        server.login(GMAIL_EMAIL, GMAIL_APP_PASSWORD)
-                        server.sendmail(GMAIL_EMAIL, NOTIFICATION_EMAIL, msg.as_string())
-                    logger.info(f"Email sent successfully via SSL for inquiry: {inquiry.id}")
-                    return True
-                except Exception as e2:
-                    logger.error(f"SSL also failed: {e2}")
-                    return False
-                    
-        except Exception as smtp_error:
-            logger.error(f"SMTP error: {smtp_error}")
+        if not RESEND_API_KEY:
+            logger.warning("Resend API key not configured")
             return False
+        
+        html_content = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; background-color: #050505; color: #F5F5F5; padding: 20px; margin: 0;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #0A0A0A; border-radius: 12px; padding: 30px; border: 1px solid #D4AF37;">
+                <h1 style="color: #D4AF37; text-align: center; margin-top: 0;">ROSHKA STUDIO</h1>
+                <p style="text-align: center; color: #A3A3A3; margin-bottom: 30px;">New Project Inquiry</p>
+                <hr style="border: none; border-top: 1px solid #D4AF37; margin: 20px 0;">
+                
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #D4AF37;">Client Name:</strong>
+                    <p style="margin: 5px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px;">{inquiry.name}</p>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #D4AF37;">Email:</strong>
+                    <p style="margin: 5px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px;">{inquiry.email}</p>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #D4AF37;">Service Type:</strong>
+                    <p style="margin: 5px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px;">{inquiry.service_type}</p>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #D4AF37;">Project Description:</strong>
+                    <p style="margin: 5px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px;">{inquiry.project_description}</p>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #D4AF37;">Budget:</strong>
+                    <p style="margin: 5px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px;">{inquiry.budget or 'Not specified'}</p>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #D4AF37;">Timeline:</strong>
+                    <p style="margin: 5px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px;">{inquiry.timeline or 'Not specified'}</p>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #D4AF37;">Submitted:</strong>
+                    <p style="margin: 5px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px;">{inquiry.timestamp.strftime('%B %d, %Y at %I:%M %p UTC')}</p>
+                </div>
+                
+                <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0 20px;">
+                <p style="text-align: center; color: #A3A3A3; font-size: 12px; margin-bottom: 0;">
+                    This email was sent automatically from your ROSHKA STUDIO website.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {RESEND_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "from": "ROSHKA STUDIO <onboarding@resend.dev>",
+                    "to": [NOTIFICATION_EMAIL],
+                    "subject": f"New Project Inquiry from {inquiry.name} - ROSHKA STUDIO",
+                    "html": html_content
+                }
+            )
             
+            if response.status_code == 200:
+                logger.info(f"Email sent successfully via Resend for inquiry: {inquiry.id}")
+                return True
+            else:
+                logger.error(f"Resend API error: {response.status_code} - {response.text}")
+                return False
+                
     except Exception as e:
-        logger.error(f"Failed to send email: {e}")
+        logger.error(f"Failed to send email via Resend: {e}")
         return False
 
 
@@ -298,7 +270,7 @@ async def create_inquiry(input: InquiryCreate, background_tasks: BackgroundTasks
         
         # Add background tasks for Google Sheets and email
         background_tasks.add_task(append_to_sheets, inquiry)
-        background_tasks.add_task(send_email_notification, inquiry)
+        background_tasks.add_task(send_email_via_resend, inquiry)
         
         logger.info(f"New inquiry created: {inquiry.id}")
         return inquiry
@@ -362,7 +334,8 @@ async def health_check():
     return {
         "status": "healthy",
         "sheets_configured": bool(GOOGLE_SHEETS_CREDENTIALS and SPREADSHEET_ID),
-        "email_configured": bool(GMAIL_EMAIL and GMAIL_APP_PASSWORD)
+        "email_configured": bool(RESEND_API_KEY),
+        "notification_email": NOTIFICATION_EMAIL
     }
 
 
