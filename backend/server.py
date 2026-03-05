@@ -225,7 +225,7 @@ async def send_email_via_resend(inquiry: Inquiry):
                     "Content-Type": "application/json"
                 },
                 json={
-                    "from": "ROSHKA STUDIO <hello@resend.dev>",
+                    "from": "ROSHKA STUDIO <hello@roshkastudio.com>",
                     "to": [NOTIFICATION_EMAIL],
                     "subject": f"New Project Inquiry from {inquiry.name} - ROSHKA STUDIO",
                     "html": html_content
@@ -302,7 +302,7 @@ async def send_thank_you_email(inquiry: Inquiry):
                     "Content-Type": "application/json"
                 },
                 json={
-                    "from": "ROSHKA STUDIO <hello@resend.dev>",
+                    "from": "ROSHKA STUDIO <hello@roshkastudio.com>",
                     "to": [inquiry.email],
                     "subject": f"Thank You for Your Inquiry - ROSHKA STUDIO",
                     "html": html_content
