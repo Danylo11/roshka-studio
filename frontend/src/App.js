@@ -573,62 +573,45 @@ const PortfolioSection = () => {
       image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
       size: "large"
     },*/
-/* {
-  title: "Luxe Lash Studio",
-  category: "Business Website",
-  size: "large",
-  content: (
-    
-    <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden">
-      <Carousel 
-        plugins={[
-          Autoplay({
-            delay: 3000,
-            stopOnInteraction: false,
-          }),
-        ]}
-        className="w-full h-full"
-      >
-        <CarouselContent className="h-full ml-0">
-          {["Luxe1.png", "Luxe2.png", "Luxe3.png", "Luxe4.png", "Luxe5.png"].map((file, index) => {
-            return (
-              <CarouselItem key={index} className="h-full pl-0">
-                <div className="relative w-full h-full">
-                  <img 
-                    src={`/${file}`} 
-                    alt={`Slide ${index + 1}`} 
-                    className="w-full h-full object-cover"
-                    onError={(e) => console.error(`Loading error: ${file}`)}
-                  />
-                </div>
-              </CarouselItem>
-            );
-          })}
-        </CarouselContent>
-        
-        {}
-        <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-          <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
-          <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
-        </div>
-      </Carousel>
-    </div>
-  )
-},*/
-    {["https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80"].map((file, index) => {
-  return (
-    <CarouselItem key={index} className="h-full pl-0">
-      <div className="relative w-full h-full">
-        <img 
-          src={file} 
-          alt="Test" 
-          className="w-full h-full object-cover"
-        />
-      </div>
-    </CarouselItem>
-  );
-})},
 
+{
+      title: "Luxe Lash Studio",
+      category: "Business Website",
+      size: "large",
+      content: (
+        <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden">
+          <Carousel 
+            plugins={[
+              Autoplay({
+                delay: 3000,
+                stopOnInteraction: false,
+              }),
+            ]}
+            className="w-full h-full"
+          >
+            <CarouselContent className="h-full ml-0">
+              {["Luxe1.png", "Luxe2.png", "Luxe3.png", "Luxe4.png", "Luxe5.png"].map((file, index) => (
+                <CarouselItem key={index} className="h-full pl-0">
+                  <div className="relative w-full h-full">
+                    <img 
+                      src={`/${file}`} 
+                      alt={`Slide ${index + 1}`} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => console.error(`Loading error: ${file}`)}
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            
+            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
+              <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
+            </div>
+          </Carousel>
+        </div>
+      )
+    },
 
     {
       title: "Your Project Here",
