@@ -585,48 +585,45 @@ const PortfolioSection = () => {
   category: "Business Website",
   size: "large",
   content: (
-    <div className="relative group w-full h-auto bg-neutral-900 rounded-xl overflow-hidden p-4">
+  <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden">
+    <Carousel 
+      opts={{
+        align: "start",
+        loop: true,
+      }}
+      plugins={[
+        Autoplay({
+          delay: 3000,
+          stopOnInteraction: false,
+        }),
+      ]}
+      className="w-full h-full"
+    >
+      {/* Добавляем flex и h-full, чтобы контент не схлопывался */}
+      <CarouselContent className="flex h-full ml-0">
+        {[Luxe1, Luxe2, Luxe3, Luxe4, Luxe5].map((imageVar, index) => (
+          <CarouselItem key={index} className="pl-0 min-w-0 shrink-0 grow-0 basis-full h-full">
+            <div className="w-full h-full">
+              <img 
+                src={imageVar} 
+                alt={`Slide ${index + 1}`} 
+                className="w-full h-full object-cover block"
+                // Добавляем проверку на ошибку, чтобы увидеть, если картинка не грузится
+                onError={(e) => console.error("Ошибка загрузки картинки:", imageVar)}
+              />
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
       
-      {/* --- ТЕСТОВЫЙ БЛОК --- */}
-      <div className="w-[200px] h-[200px] border-4 border-red-500 mb-6 mx-auto">
-        <img 
-          src={Luxe1} 
-          alt="Test" 
-          className="w-full h-full object-cover" 
-        />
+      {/* Кнопки навигации */}
+      <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+        <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
+        <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
       </div>
-      {/* -------------------- */}
-
-      <Carousel 
-        plugins={[
-          Autoplay({
-            delay: 3000,
-            stopOnInteraction: false,
-          }),
-        ]}
-        className="w-full h-[450px] md:h-[600px]"
-      >
-        <CarouselContent className="h-full ml-0">
-          {[Luxe1, Luxe2, Luxe3, Luxe4, Luxe5].map((image, index) => (
-            <CarouselItem key={index} className="h-full pl-0">
-              <div className="relative w-full h-full">
-                <img 
-                  src={image} 
-                  alt={`Luxe Lash ${index + 1}`} 
-                  className="w-full h-full object-cover" 
-                />
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        
-        <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-          <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
-          <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
-        </div>
-      </Carousel>
-    </div>
-  )
+    </Carousel>
+  </div>
+)
 },
 
     {
