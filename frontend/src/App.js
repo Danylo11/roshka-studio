@@ -573,41 +573,48 @@ const PortfolioSection = () => {
       image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
       size: "large"
     },*/
-      {
+    {
       title: "Luxe Lash Studio",
       category: "Business Website",
       size: "large",
       content: (
-        <div className="relative group w-full h-[450px] md:h-[600px]">
+    /* ВАЖНО: h-[450px] дает карусели размер. Без этого будет черный экран */
+        <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden">
           <Carousel 
             plugins={[
               Autoplay({
                 delay: 3000,
-              }),  
+                stopOnInteraction: false,
+              }),
             ]}
-            className="w-full h-full rounded-xl overflow-hidden shadow-2xl border border-white/10"
+            className="w-full h-full"
           >
             <CarouselContent className="h-full">
               {["Luxe1.png", "Luxe2.png", "Luxe3.png", "Luxe4.png", "Luxe5.png"].map((file, index) => (
                 <CarouselItem key={index} className="h-full">
-                  <img 
-                    src={`/${file}`} 
-                    alt={`Luxe Slide ${index + 1}`} 
-                    className="w-full h-full object-cover" 
-                  />
+                  <div className="relative w-full h-full">
+                    <img 
+                      src={`/${file}`} 
+                      alt={`Slide ${index + 1}`} 
+                      className="w-full h-full object-cover"
+                  /* Добавим проверку: если картинка не грузится, будет виден текст */
+                      onError={(e) => console.error(`Ошибка загрузки: ${file}`)}
+                    />
+                  </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
         
-            {/* Кнопки навигации — появляются при наведении */}
-            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-              <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 text-white border-none hover:bg-black/80 w-10 h-10" />
-              <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 text-white border-none hover:bg-black/80 w-10 h-10" />
+            {/* Кнопки навигации */}
+            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 text-white border-none w-10 h-10" />
+              <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 text-white border-none w-10 h-10" />
             </div>
           </Carousel>
         </div>
       )
     },
+
 
     {
       title: "Your Project Here",
