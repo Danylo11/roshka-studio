@@ -612,7 +612,7 @@ const PortfolioSection = () => {
       </Carousel>
     </div>
   )
-}
+},
 
 
     {
