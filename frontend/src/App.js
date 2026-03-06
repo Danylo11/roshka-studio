@@ -21,15 +21,15 @@ import {
   Zap,
   Award
 } from "lucide-react";
-import Luxe1 from './assets/Luxe1.png';
-import Luxe2 from './assets/Luxe2.png';
-import Luxe3 from './assets/Luxe3.png';
-import Luxe4 from './assets/Luxe4.png';
-import Luxe5 from './assets/Luxe5.png';
+//import Luxe1 from './assets/Luxe1.png';
+//import Luxe2 from './assets/Luxe2.png';
+//import Luxe3 from './assets/Luxe3.png';
+//import Luxe4 from './assets/Luxe4.png';
+//import Luxe5 from './assets/Luxe5.png';
 
-import Autoplay from "embla-carousel-autoplay";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./components/ui/carousel";
-import { Toaster, toast } from "sonner";
+//import Autoplay from "embla-carousel-autoplay";
+//import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./components/ui/carousel";
+//import { Toaster, toast } from "sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -571,8 +571,29 @@ const AboutSection = () => {
 };
 
 // Enhanced Portfolio Section
+// Portfolio Section with Carousel for Business Website
 const PortfolioSection = () => {
+  const [businessSlide, setBusinessSlide] = useState(0);
+
+  // Images for Business Website carousel
+  const businessImages = [
+    "/Luxe1.png",
+    "/Luxe2.png", 
+    "/Luxe3.png"
+  ];
+
+
+  // Auto-play for Business Website carousel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBusinessSlide((prev) => (prev + 1) % businessImages.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [businessImages.length]);
+  
   const portfolioItems = [
+
+  
     /*{
       title: "Your Project Here",
       category: "Business Website",
