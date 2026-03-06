@@ -585,7 +585,18 @@ const PortfolioSection = () => {
   category: "Business Website",
   size: "large",
   content: (
-    <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden">
+    <div className="relative group w-full h-auto bg-neutral-900 rounded-xl overflow-hidden p-4">
+      
+      {/* --- ТЕСТОВЫЙ БЛОК --- */}
+      <div className="w-[200px] h-[200px] border-4 border-red-500 mb-6 mx-auto">
+        <img 
+          src={Luxe1} 
+          alt="Test" 
+          className="w-full h-full object-cover" 
+        />
+      </div>
+      {/* -------------------- */}
+
       <Carousel 
         plugins={[
           Autoplay({
@@ -593,7 +604,7 @@ const PortfolioSection = () => {
             stopOnInteraction: false,
           }),
         ]}
-        className="w-full h-full"
+        className="w-full h-[450px] md:h-[600px]"
       >
         <CarouselContent className="h-full ml-0">
           {[Luxe1, Luxe2, Luxe3, Luxe4, Luxe5].map((image, index) => (
