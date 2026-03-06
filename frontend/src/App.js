@@ -585,7 +585,8 @@ const PortfolioSection = () => {
   category: "Business Website",
   size: "large",
   content: (
-  <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden">
+    /* Добавляем min-h, чтобы блок точно имел высоту */
+  <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden border-2 border-yellow-500">
     <Carousel 
       opts={{
         align: "start",
@@ -599,27 +600,27 @@ const PortfolioSection = () => {
       ]}
       className="w-full h-full"
     >
-      {/* Добавляем flex и h-full, чтобы контент не схлопывался */}
-      <CarouselContent className="flex h-full ml-0">
-        {[Luxe1, Luxe2, Luxe3, Luxe4, Luxe5].map((imageVar, index) => (
-          <CarouselItem key={index} className="pl-0 min-w-0 shrink-0 grow-0 basis-full h-full">
-            <div className="w-full h-full">
+      {/* flex и h-full критически важны для Embla Carousel */}
+      <CarouselContent className="flex h-full m-0 p-0">
+        {[Luxe1, Luxe2, Luxe3, Luxe4, Luxe5].map((imgVar, index) => (
+          <CarouselItem key={index} className="min-w-0 shrink-0 grow-0 basis-full h-full p-0">
+            <div className="relative w-full h-full flex items-center justify-center">
               <img 
-                src={imageVar} 
-                alt={`Slide ${index + 1}`} 
+                src={imgVar} 
+                alt={`Luxe ${index + 1}`} 
                 className="w-full h-full object-cover block"
-                // Добавляем проверку на ошибку, чтобы увидеть, если картинка не грузится
-                onError={(e) => console.error("Ошибка загрузки картинки:", imageVar)}
+                /* Если картинка не загрузится, мы увидим красный фон */
+                style={{ backgroundColor: 'red' }} 
               />
             </div>
           </CarouselItem>
         ))}
       </CarouselContent>
       
-      {/* Кнопки навигации */}
-      <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-        <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
-        <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
+      {/* Кнопки навигации — делаем их всегда видимыми для теста */}
+      <div className="absolute inset-0 flex items-center justify-between px-4 pointer-events-none">
+        <CarouselPrevious className="pointer-events-auto relative translate-x-0 bg-white/20 text-white" />
+        <CarouselNext className="pointer-events-auto relative translate-x-0 bg-white/20 text-white" />
       </div>
     </Carousel>
   </div>
