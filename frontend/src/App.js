@@ -573,47 +573,46 @@ const PortfolioSection = () => {
       image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
       size: "large"
     },*/
-    {
-      title: "Luxe Lash Studio",
-      category: "Business Website",
-      size: "large",
-      content: (
-    /* ВАЖНО: h-[450px] дает карусели размер. Без этого будет черный экран */
-        <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden">
-          <Carousel 
-            plugins={[
-              Autoplay({
-                delay: 3000,
-                stopOnInteraction: false,
-              }),
-            ]}
-            className="w-full h-full"
-          >
-            <CarouselContent className="h-full">
-              {["Luxe1.png", "Luxe2.png", "Luxe3.png", "Luxe4.png", "Luxe5.png"].map((file, index) => (
-                <CarouselItem key={index} className="h-full">
-                  <div className="relative w-full h-full">
-                    <img 
-                      src={`/${file}`} 
-                      alt={`Slide ${index + 1}`} 
-                      className="w-full h-full object-cover"
-                  /* Добавим проверку: если картинка не грузится, будет виден текст */
-                      onError={(e) => console.error(`Ошибка загрузки: ${file}`)}
-                    />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
+   {
+  title: "Luxe Lash Studio",
+  category: "Business Website",
+  size: "large",
+  content: (
+    /* IMPORTANT: h-[450px] gives the carousel size. Without it, you get a black screen */
+    <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden">
+      <Carousel 
+        plugins={[
+          Autoplay({
+            delay: 3000,
+            stopOnInteraction: false,
+          }),
+        ]}
+        className="w-full h-full"
+      >
+        <CarouselContent className="h-full ml-0">
+          {["Luxe1.png", "Luxe2.png", "Luxe3.png", "Luxe4.png", "Luxe5.png"].map((file, index) => (
+            <CarouselItem key={index} className="h-full pl-0">
+              <div className="relative w-full h-full">
+                <img 
+                  src={`/${file}`} 
+                  alt={`Slide ${index + 1}`} 
+                  className="w-full h-full object-cover"
+                  onError={(e) => console.error(`Loading error: ${file}`)}
+                />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
         
-            {/* Кнопки навигации */}
-            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 text-white border-none w-10 h-10" />
-              <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 text-white border-none w-10 h-10" />
-            </div>
-          </Carousel>
+        {/* Navigation Buttons */}
+        <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
+          <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
         </div>
-      )
-    },
+      </Carousel>
+    </div>
+  )
+}
 
 
     {
