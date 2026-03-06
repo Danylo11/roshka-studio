@@ -21,15 +21,7 @@ import {
   Zap,
   Award
 } from "lucide-react";
-//import Luxe1 from './assets/Luxe1.png';
-//import Luxe2 from './assets/Luxe2.png';
-//import Luxe3 from './assets/Luxe3.png';
-//import Luxe4 from './assets/Luxe4.png';
-//import Luxe5 from './assets/Luxe5.png';
-
-//import Autoplay from "embla-carousel-autoplay";
-//import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./components/ui/carousel";
-//import { Toaster, toast } from "sonner";
+import { Toaster, toast } from "sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -359,7 +351,6 @@ const ServicesSection = () => {
       features: ["Custom Design", "Mobile Responsive", "SEO Optimized"],
       gradient: "from-blue-500/20 to-purple-500/20"
     },
-
     {
       icon: Palette,
       title: "Landing Page",
@@ -574,15 +565,14 @@ const AboutSection = () => {
 // Portfolio Section with Carousel for Business Website
 const PortfolioSection = () => {
   const [businessSlide, setBusinessSlide] = useState(0);
-
+  
   // Images for Business Website carousel
   const businessImages = [
-    "/Luxe1.png",
-    "/Luxe2.png", 
-    "/Luxe3.png"
+    "/portfolio1.png",
+    "/portfolio2.png", 
+    "/portfolio3.png"
   ];
-
-
+  
   // Auto-play for Business Website carousel
   useEffect(() => {
     const interval = setInterval(() => {
@@ -592,68 +582,12 @@ const PortfolioSection = () => {
   }, [businessImages.length]);
   
   const portfolioItems = [
-
-  
-    /*{
-      title: "Your Project Here",
-      category: "Business Website",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
-      size: "large"
-    },*/
-
     {
       title: "Luxe Lash Studio",
       category: "Business Website",
-      size: "large",
-      content: (
-        <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden">
-          <Carousel 
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            plugins={[
-              Autoplay({
-                delay: 3000,
-                stopOnInteraction: false,
-              }),
-            ]}
-            style={{ height: '100%', width: '100%' }}
-          >
-            {/* Мы добавляем min-h-full, чтобы контент не мог стать меньше родителя */}
-            <CarouselContent className="flex m-0 p-0 h-full" style={{ height: '100%', display: 'flex' }}>
-              {[Luxe1, Luxe2, Luxe3, Luxe4, Luxe5].map((imgVar, index) => (
-                <CarouselItem 
-                  key={index} 
-                  className="p-0 m-0"
-                  style={{ 
-                    minWidth: '100%', 
-                    height: '100%',
-                    flex: '0 0 100%' 
-                  }}
-                >
-                  <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-                    <img 
-                      src={imgVar} 
-                      alt={`Luxe ${index + 1}`} 
-                      className="w-full h-full object-cover block"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  </div>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      
-      {/* Кнопки навигации */}
-      <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-        <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 text-white border-none w-10 h-10 flex items-center justify-center rounded-full" />
-        <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 text-white border-none w-10 h-10 flex items-center justify-center rounded-full" />
-      </div>
-    </Carousel>
-  </div>
-)
+      isCarousel: true,
+      size: "large"
     },
-
     {
       title: "Your Project Here",
       category: "E-commerce",
@@ -712,16 +646,64 @@ const PortfolioSection = () => {
               }`}
               data-testid={`portfolio-item-${index}`}
             >
-              <img 
-                src={item.image}
-                alt={item.title}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              />
+              {/* Business Website with Carousel */}
+              {item.isCarousel ? (
+                <>
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={businessSlide}
+                      src={businessImages[businessSlide]}
+                      alt={item.title}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.5 }}
+                      className="w-full h-full object-cover absolute inset-0"
+                    />
+                  </AnimatePresence>
+                  
+                  {/* Carousel Navigation */}
+                  <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                    {businessImages.map((_, imgIndex) => (
+                      <button
+                        key={imgIndex}
+                        onClick={(e) => { e.stopPropagation(); setBusinessSlide(imgIndex); }}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          businessSlide === imgIndex 
+                            ? 'bg-roshka-gold w-6' 
+                            : 'bg-white/50 hover:bg-white/80'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* Arrow buttons */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setBusinessSlide((prev) => (prev - 1 + businessImages.length) % businessImages.length); }}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-roshka-bg/60 backdrop-blur-sm flex items-center justify-center text-roshka-gold hover:bg-roshka-gold hover:text-roshka-bg transition-all z-20 opacity-0 group-hover:opacity-100"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setBusinessSlide((prev) => (prev + 1) % businessImages.length); }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-roshka-bg/60 backdrop-blur-sm flex items-center justify-center text-roshka-gold hover:bg-roshka-gold hover:text-roshka-bg transition-all z-20 opacity-0 group-hover:opacity-100"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+                  </button>
+                </>
+              ) : (
+                <img 
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              )}
+              
               {/* Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-roshka-bg via-roshka-bg/50 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
               
               {/* Content */}
-              <div className="absolute inset-0 p-6 flex flex-col justify-end">
+              <div className="absolute inset-0 p-6 flex flex-col justify-end z-10">
                 <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                   <span className="inline-block font-mono text-xs text-roshka-gold uppercase tracking-wider mb-2 px-3 py-1 rounded-full bg-roshka-gold/20">
                     {item.category}
@@ -733,7 +715,7 @@ const PortfolioSection = () => {
               </div>
               
               {/* Hover border */}
-              <div className="absolute inset-0 border-2 border-roshka-gold/0 group-hover:border-roshka-gold/30 rounded-2xl transition-colors duration-500" />
+              <div className="absolute inset-0 border-2 border-roshka-gold/0 group-hover:border-roshka-gold/30 rounded-2xl transition-colors duration-500 z-10" />
             </motion.div>
           ))}
         </div>
