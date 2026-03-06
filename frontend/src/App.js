@@ -590,11 +590,11 @@ const PortfolioSection = () => {
             className="w-full h-full"
           >
             <div className="w-full h-[450px]">
-            <img 
-              src="/Luxe1.png" 
-              alt="Test" 
-              className="w-full h-full object-cover" 
-            />
+          <img 
+  src={process.env.PUBLIC_URL + "/Luxe1.png"} 
+  alt="Test" 
+  className="w-full h-full object-cover" 
+/>
           </div>
             
             <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
