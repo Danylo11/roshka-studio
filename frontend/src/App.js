@@ -21,6 +21,7 @@ import {
   Zap,
   Award
 } from "lucide-react";
+import Autoplay from "embla-carousel-autoplay";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./components/ui/carousel";
 import { Toaster, toast } from "sonner";
 
@@ -345,35 +346,11 @@ const HeroSection = () => {
 // Enhanced Services Section
 const ServicesSection = () => {
   const services = [
-    /*{
+    {
       icon: Globe,
       title: "Business Website",
       description: "Custom-designed professional websites that elevate your brand and convert visitors into clients.",
       features: ["Custom Design", "Mobile Responsive", "SEO Optimized"],
-      gradient: "from-blue-500/20 to-purple-500/20"
-    },*/
-        {
-      icon: Globe,
-      title: "Business Website",
-      description: "Luxe Lash Studio — A premium beauty concept in Washington, DC. Features a complete service menu, pricing architecture ($65–$300), and integrated client testimonials.",
-      content: (
-        <div className="relative group mt-4">
-          <Carousel className="w-full rounded-xl overflow-hidden shadow-2xl border border-white/10">
-            <CarouselContent>
-              <CarouselItem><img src="/Luxe1.png" alt="Home" className="w-full h-auto object-cover" /></CarouselItem>
-              <CarouselItem><img src="/Luxe2.png" alt="Services" className="w-full h-auto object-cover" /></CarouselItem>
-              <CarouselItem><img src="/Luxe3.png" alt="Add-ons" className="w-full h-auto object-cover" /></CarouselItem>
-              <CarouselItem><img src="/Luxe4.png" alt="Reviews" className="w-full h-auto object-cover" /></CarouselItem>
-              <CarouselItem><img src="/Luxe5.png" alt="Contact" className="w-full h-auto object-cover" /></CarouselItem>
-            </CarouselContent>
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-              <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white border-none" />
-              <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white border-none" />
-            </div>
-          </Carousel>
-        </div>
-      ),
-      features: ["Custom UI/UX", "Service Menu", "Review System", "Mobile Responsive"],
       gradient: "from-blue-500/20 to-purple-500/20"
     },
 
@@ -601,27 +578,37 @@ const PortfolioSection = () => {
       category: "Business Website",
       size: "large",
       content: (
-        <div className="relative group w-full h-full">
-          <Carousel className="w-full h-full rounded-xl overflow-hidden shadow-2xl border border-white/10">
-            <CarouselContent>
-              <CarouselItem><img src="/Luxe1.png" alt="Luxe Lash Home" className="w-full h-full object-cover" /></CarouselItem>
-              <CarouselItem><img src="/Luxe2.png" alt="Service Menu" className="w-full h-full object-cover" /></CarouselItem>
-              <CarouselItem><img src="/Luxe3.png" alt="Add-ons" className="w-full h-full object-cover" /></CarouselItem>
-              <CarouselItem><img src="/Luxe4.png" alt="Client Reviews" className="w-full h-full object-cover" /></CarouselItem>
-              <CarouselItem><img src="/Luxe5.png" alt="Contact Info" className="w-full h-full object-cover" /></CarouselItem>
+        <div className="relative group w-full h-[450px] md:h-[600px]">
+          <Carousel 
+            plugins={[
+              Autoplay({
+                delay: 3000,
+              }),  
+            ]}
+            className="w-full h-full rounded-xl overflow-hidden shadow-2xl border border-white/10"
+          >
+            <CarouselContent className="h-full">
+              {["Luxe1.png", "Luxe2.png", "Luxe3.png", "Luxe4.png", "Luxe5.png"].map((file, index) => (
+                <CarouselItem key={index} className="h-full">
+                  <img 
+                    src={`/${file}`} 
+                    alt={`Luxe Slide ${index + 1}`} 
+                    className="w-full h-full object-cover" 
+                  />
+                </CarouselItem>
+              ))}
             </CarouselContent>
-            {/* Стрелочки навигации */}
-            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-              <CarouselPrevious className="static translate-x-0 bg-black/50 text-white border-none hover:bg-black/80 w-10 h-10" />
-              <CarouselNext className="static translate-x-0 bg-black/50 text-white border-none hover:bg-black/80 w-10 h-10" />
+        
+            {/* Кнопки навигации — появляются при наведении */}
+            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 text-white border-none hover:bg-black/80 w-10 h-10" />
+              <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 text-white border-none hover:bg-black/80 w-10 h-10" />
             </div>
           </Carousel>
         </div>
       )
     },
 
-
-    
     {
       title: "Your Project Here",
       category: "E-commerce",
