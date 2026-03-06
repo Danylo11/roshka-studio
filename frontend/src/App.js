@@ -580,52 +580,49 @@ const PortfolioSection = () => {
       size: "large"
     },*/
 
-{
-  title: "Luxe Lash Studio",
-  category: "Business Website",
-  size: "large",
-  content: (
-    /* Добавляем min-h, чтобы блок точно имел высоту */
-  <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden border-2 border-yellow-500">
-    <Carousel 
-      opts={{
-        align: "start",
-        loop: true,
-      }}
-      plugins={[
-        Autoplay({
-          delay: 3000,
-          stopOnInteraction: false,
-        }),
-      ]}
-      className="w-full h-full"
-    >
-      {/* flex и h-full критически важны для Embla Carousel */}
-      <CarouselContent className="flex h-full m-0 p-0">
-        {[Luxe1, Luxe2, Luxe3, Luxe4, Luxe5].map((imgVar, index) => (
-          <CarouselItem key={index} className="min-w-0 shrink-0 grow-0 basis-full h-full p-0">
-            <div className="relative w-full h-full flex items-center justify-center">
-              <img 
-                src={imgVar} 
-                alt={`Luxe ${index + 1}`} 
-                className="w-full h-full object-cover block"
-                /* Если картинка не загрузится, мы увидим красный фон */
-                style={{ backgroundColor: 'red' }} 
-              />
+    {
+      title: "Luxe Lash Studio",
+      category: "Business Website",
+      size: "large",
+      content: (
+        <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden">
+          <Carousel 
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            plugins={[
+              Autoplay({
+                delay: 3000,
+                stopOnInteraction: false,
+              }),
+            ]}
+            className="w-full h-full"
+          >
+            {/* h-full здесь растягивает контент на всю высоту родителя */}
+            <CarouselContent className="flex h-full m-0 p-0">
+              {[Luxe1, Luxe2, Luxe3, Luxe4, Luxe5].map((imgVar, index) => (
+                <CarouselItem key={index} className="min-w-0 shrink-0 grow-0 basis-full h-full p-0">
+                  <div className="relative w-full h-full">
+                    <img 
+                      src={imgVar} 
+                      alt={`Luxe Lash ${index + 1}`} 
+                      className="w-full h-full object-cover block"
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+        
+            {/* Кнопки навигации — появляются при наведении (group-hover) */}
+            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10 flex items-center justify-center rounded-full" />
+              <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10 flex items-center justify-center rounded-full" />
             </div>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      
-      {/* Кнопки навигации — делаем их всегда видимыми для теста */}
-      <div className="absolute inset-0 flex items-center justify-between px-4 pointer-events-none">
-        <CarouselPrevious className="pointer-events-auto relative translate-x-0 bg-white/20 text-white" />
-        <CarouselNext className="pointer-events-auto relative translate-x-0 bg-white/20 text-white" />
-      </div>
-    </Carousel>
-  </div>
-)
-},
+          </Carousel>
+        </div>
+      )
+    },
 
     {
       title: "Your Project Here",
