@@ -597,31 +597,40 @@ const PortfolioSection = () => {
                 stopOnInteraction: false,
               }),
             ]}
-            className="w-full h-full"
+            style={{ height: '100%', width: '100%' }}
           >
-            {/* h-full здесь растягивает контент на всю высоту родителя */}
-            <CarouselContent className="flex h-full m-0 p-0">
+            {/* Мы добавляем min-h-full, чтобы контент не мог стать меньше родителя */}
+            <CarouselContent className="flex m-0 p-0 h-full" style={{ height: '100%', display: 'flex' }}>
               {[Luxe1, Luxe2, Luxe3, Luxe4, Luxe5].map((imgVar, index) => (
-                <CarouselItem key={index} className="min-w-0 shrink-0 grow-0 basis-full h-full p-0">
-                  <div className="relative w-full h-full">
+                <CarouselItem 
+                  key={index} 
+                  className="p-0 m-0"
+                  style={{ 
+                    minWidth: '100%', 
+                    height: '100%',
+                    flex: '0 0 100%' 
+                  }}
+                >
+                  <div style={{ width: '100%', height: '100%', position: 'relative' }}>
                     <img 
                       src={imgVar} 
-                      alt={`Luxe Lash ${index + 1}`} 
+                      alt={`Luxe ${index + 1}`} 
                       className="w-full h-full object-cover block"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-        
-            {/* Кнопки навигации — появляются при наведении (group-hover) */}
-            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10 flex items-center justify-center rounded-full" />
-              <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10 flex items-center justify-center rounded-full" />
-            </div>
-          </Carousel>
-        </div>
-      )
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      
+      {/* Кнопки навигации */}
+      <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+        <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 text-white border-none w-10 h-10 flex items-center justify-center rounded-full" />
+        <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 text-white border-none w-10 h-10 flex items-center justify-center rounded-full" />
+      </div>
+    </Carousel>
+  </div>
+)
     },
 
     {
