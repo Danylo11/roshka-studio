@@ -578,7 +578,7 @@ const PortfolioSection = () => {
   category: "Business Website",
   size: "large",
   content: (
-    /* IMPORTANT: h-[450px] gives the carousel size. Without it, you get a black screen */
+    /* ВАЖНО: h-[450px] задает высоту. Без этого будет черный экран */
     <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden">
       <Carousel 
         plugins={[
