@@ -21,6 +21,12 @@ import {
   Zap,
   Award
 } from "lucide-react";
+import Luxe1 from './assets/Luxe1.png';
+import Luxe2 from './assets/Luxe2.png';
+import Luxe3 from './assets/Luxe3.png';
+import Luxe4 from './assets/Luxe4.png';
+import Luxe5 from './assets/Luxe5.png';
+
 import Autoplay from "embla-carousel-autoplay";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./components/ui/carousel";
 import { Toaster, toast } from "sonner";
@@ -575,36 +581,42 @@ const PortfolioSection = () => {
     },*/
 
 {
-      title: "Luxe Lash Studio",
-      category: "Business Website",
-      size: "large",
-      content: (
-        <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden">
-          <Carousel 
-            plugins={[
-              Autoplay({
-                delay: 3000,
-                stopOnInteraction: false,
-              }),
-            ]}
-            className="w-full h-full"
-          >
-            <div className="w-full h-[450px]">
-          <img 
-  src={process.env.PUBLIC_URL + "/Luxe1.png"} 
-  alt="Test" 
-  className="w-full h-full object-cover" 
-/>
-          </div>
-            
-            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
-              <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
-            </div>
-          </Carousel>
+  title: "Luxe Lash Studio",
+  category: "Business Website",
+  size: "large",
+  content: (
+    <div className="relative group w-full h-[450px] md:h-[600px] bg-neutral-900 rounded-xl overflow-hidden">
+      <Carousel 
+        plugins={[
+          Autoplay({
+            delay: 3000,
+            stopOnInteraction: false,
+          }),
+        ]}
+        className="w-full h-full"
+      >
+        <CarouselContent className="h-full ml-0">
+          {[Luxe1, Luxe2, Luxe3, Luxe4, Luxe5].map((image, index) => (
+            <CarouselItem key={index} className="h-full pl-0">
+              <div className="relative w-full h-full">
+                <img 
+                  src={image} 
+                  alt={`Luxe Lash ${index + 1}`} 
+                  className="w-full h-full object-cover" 
+                />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        
+        <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          <CarouselPrevious className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
+          <CarouselNext className="pointer-events-auto static translate-x-0 bg-black/50 hover:bg-black/70 text-white border-none w-10 h-10" />
         </div>
-      )
-    },
+      </Carousel>
+    </div>
+  )
+},
 
     {
       title: "Your Project Here",
