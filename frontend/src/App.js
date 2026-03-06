@@ -596,12 +596,30 @@ const PortfolioSection = () => {
       image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
       size: "large"
     },*/
-    {
+      {
       title: "Luxe Lash Studio",
       category: "Business Website",
-      image: "/Luxe1.png",
-      size: "large"
+      size: "large",
+      content: (
+        <div className="relative group w-full h-full">
+          <Carousel className="w-full h-full rounded-xl overflow-hidden shadow-2xl border border-white/10">
+            <CarouselContent>
+              <CarouselItem><img src="/Luxe1.png" alt="Luxe Lash Home" className="w-full h-full object-cover" /></CarouselItem>
+              <CarouselItem><img src="/Luxe2.png" alt="Service Menu" className="w-full h-full object-cover" /></CarouselItem>
+              <CarouselItem><img src="/Luxe3.png" alt="Add-ons" className="w-full h-full object-cover" /></CarouselItem>
+              <CarouselItem><img src="/Luxe4.png" alt="Client Reviews" className="w-full h-full object-cover" /></CarouselItem>
+              <CarouselItem><img src="/Luxe5.png" alt="Contact Info" className="w-full h-full object-cover" /></CarouselItem>
+            </CarouselContent>
+            {/* Стрелочки навигации */}
+            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+              <CarouselPrevious className="static translate-x-0 bg-black/50 text-white border-none hover:bg-black/80 w-10 h-10" />
+              <CarouselNext className="static translate-x-0 bg-black/50 text-white border-none hover:bg-black/80 w-10 h-10" />
+            </div>
+          </Carousel>
+        </div>
+      )
     },
+
 
     
     {
