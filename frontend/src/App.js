@@ -582,6 +582,29 @@ const PortfolioSection = () => {
     }, 4000);
     return () => clearInterval(interval);
   }, [businessImages.length]);
+
+
+
+//
+const PortfolioSection = () => {
+  const [EcommerceSlide, setEcommerceSlide] = useState(0);
+  
+  // Images for Business Website carousel
+  const businessImages = [
+    process.env.PUBLIC_URL + "/iron1.png",
+    process.env.PUBLIC_URL + "/iron2.png", 
+    process.env.PUBLIC_URL + "/iron3.png",
+    process.env.PUBLIC_URL + "/iron14.png"
+  ]
+  
+  // Auto-play for Business Website carousel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setEcommerceSlide((prev) => (prev + 1) % EcommerceImages.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [EcommerceImages.length]);
+  
   
   const portfolioItems = [
     {
@@ -590,10 +613,11 @@ const PortfolioSection = () => {
       isCarousel: true,
       size: "large"
     },
+    
     {
-      title: "Your Project Here",
+      title: "Iron. Block. Deli",
       category: "E-commerce",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
+      isCarousel: true,
       size: "small"
     },
     {
