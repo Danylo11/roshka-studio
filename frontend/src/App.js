@@ -628,7 +628,7 @@ const PortfolioSection = () => {
       title: "Luxe Lash Studio",
       category: "Business Website",
       isCarousel: true,
-      image: businessImages,
+      images: businessImages,
       currentIndex: businessSlide,
       size: "large"
     },
@@ -637,7 +637,7 @@ const PortfolioSection = () => {
       title: "Iron. Block. Deli",
       category: "E-commerce",
       isCarousel: true,
-      image: ecommerceImages,
+      images: ecommerceImages,
       currentIndex: ecommerceSlide,
       size: "small"
     },
@@ -655,7 +655,92 @@ const PortfolioSection = () => {
     }
   ];
 
+  
   return (
+    <section id="portfolio" className="py-24 md:py-32 relative">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        {/* Заголовок секции */}
+        <motion.div className="text-center mb-20" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}>
+          <h2 className="text-4xl md:text-6xl font-bold mb-6">
+            <span className="text-gold-gradient">Portfolio</span>
+          </h2>
+        </motion.div>
+
+        {/* Сетка проектов */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {portfolioItems.map((item, index) => (
+            <motion.div
+              key={index}
+              className={`group relative rounded-2xl overflow-hidden cursor-pointer ${
+                index === 0 ? 'md:col-span-2 aspect-[16/9]' : 'aspect-square'
+              }`}
+            >
+              {item.isCarousel ? (
+                <>
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={item.currentIndex}
+                      src={item.images[item.currentIndex]}
+                      alt={item.title}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="w-full h-full object-cover absolute inset-0"
+                    />
+                  </AnimatePresence>
+                  
+                  {/* Навигация (точки) */}
+                  <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                    {item.images.map((_, imgIndex) => (
+                      <button
+                        key={imgIndex}
+                        onClick={(e) => { e.stopPropagation(); item.setIndex(imgIndex); }}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                          item.currentIndex === imgIndex ? 'bg-roshka-gold w-6' : 'bg-white/50'
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Кнопки стрелки */}
+                  <button
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      item.setIndex((prev) => (prev - 1 + item.images.length) % item.images.length); 
+                    }}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    ←
+                  </button>
+                  <button
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      item.setIndex((prev) => (prev + 1) % item.images.length); 
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    →
+                  </button>
+                </>
+              ) : (
+                <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+              )}
+              
+              {/* Оверлей и Текст */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent p-6 flex flex-col justify-end">
+                <span className="text-roshka-gold text-xs uppercase mb-2">{item.category}</span>
+                <h3 className="text-2xl text-white">{item.title}</h3>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+
+  /*return (
     <section id="portfolio" className="py-24 md:py-32 relative" data-testid="portfolio-section">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.div
@@ -793,7 +878,7 @@ const PortfolioSection = () => {
       </div>
     </section>
   );
-};
+};*/
 
 // Enhanced Process Section
 const ProcessSection = () => {
