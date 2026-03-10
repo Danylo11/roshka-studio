@@ -576,7 +576,7 @@ const PortfolioSection = () => {
     process.env.PUBLIC_URL + "/portfolio5.png"
   ];
   
-  const businessImages = [
+  const ecommerceImages = [
     process.env.PUBLIC_URL + "/iron1.png",
     process.env.PUBLIC_URL + "/iron2.png", 
     process.env.PUBLIC_URL + "/iron3.png",
