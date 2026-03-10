@@ -562,12 +562,14 @@ const AboutSection = () => {
 };
 
 // Enhanced Portfolio Section
-// Portfolio Section with Carousel for Business Website
+// Portfolio Section with Carousel for All Categories
 const PortfolioSection = () => {
   const [businessSlide, setBusinessSlide] = useState(0);
   const [ecommerceSlide, setEcommerceSlide] = useState(0);
+  const [landingSlide, setLandingSlide] = useState(0);
+  const [customSlide, setCustomSlide] = useState(0);
   
-  // Images for Business Website carousel
+  // Images for each carousel
   const businessImages = [
     process.env.PUBLIC_URL + "/portfolio1.png",
     process.env.PUBLIC_URL + "/portfolio2.png", 
@@ -580,19 +582,27 @@ const PortfolioSection = () => {
     process.env.PUBLIC_URL + "/iron1.png",
     process.env.PUBLIC_URL + "/iron2.png", 
     process.env.PUBLIC_URL + "/iron3.png",
-    process.env.PUBLIC_URL + "/iron4.png",
-    process.env.PUBLIC_URL + "/iron2.png",
-  ]
+    process.env.PUBLIC_URL + "/iron4.png"
+  ];
   
+  const landingImages = [
+    process.env.PUBLIC_URL + "/landing1.png",
+    process.env.PUBLIC_URL + "/landing2.png",
+    process.env.PUBLIC_URL + "/landing3.png"
+  ];
   
-  // Auto-play for Business Website carousel
+  const customImages = [
+    process.env.PUBLIC_URL + "/custom1.png",
+    process.env.PUBLIC_URL + "/custom2.png"
+  ];
+  
+  // Auto-play for all carousels
   useEffect(() => {
     const interval = setInterval(() => {
       setBusinessSlide((prev) => (prev + 1) % businessImages.length);
     }, 4000);
     return () => clearInterval(interval);
   }, [businessImages.length]);
-
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -601,28 +611,19 @@ const PortfolioSection = () => {
     return () => clearInterval(interval);
   }, [ecommerceImages.length]);
 
-
-
-/*
-const PortfolioSection = () => {
-  const [EcommerceSlide, setEcommerceSlide] = useState(0);
-  
-  // Images for Business Website carousel
-  const businessImages = [
-    process.env.PUBLIC_URL + "/iron1.png",
-    process.env.PUBLIC_URL + "/iron2.png", 
-    process.env.PUBLIC_URL + "/iron3.png",
-    process.env.PUBLIC_URL + "/iron14.png"
-  ]
-  
-  // Auto-play for Business Website carousel
   useEffect(() => {
     const interval = setInterval(() => {
-      setEcommerceSlide((prev) => (prev + 1) % EcommerceImages.length);
+      setLandingSlide((prev) => (prev + 1) % landingImages.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, [EcommerceImages.length]);*/
-  
+  }, [landingImages.length]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCustomSlide((prev) => (prev + 1) % customImages.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [customImages.length]);
   
   const portfolioItems = [
     {
@@ -631,27 +632,34 @@ const PortfolioSection = () => {
       isCarousel: true,
       images: businessImages,
       currentIndex: businessSlide,
+      setIndex: setBusinessSlide,
       size: "large"
     },
-    
     {
       title: "Iron. Block. Deli",
       category: "E-commerce",
       isCarousel: true,
       images: ecommerceImages,
       currentIndex: ecommerceSlide,
+      setIndex: setEcommerceSlide,
       size: "small"
     },
     {
-      title: "Your Project Here",
+      title: "Creative Landing Pages",
       category: "Landing Page",
-      image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=600&q=80",
+      isCarousel: true,
+      images: landingImages,
+      currentIndex: landingSlide,
+      setIndex: setLandingSlide,
       size: "small"
     },
     {
-      title: "Your Project Here",
+      title: "Block & Barrel Restaurant",
       category: "Custom Project",
-      image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600&q=80",
+      isCarousel: true,
+      images: customImages,
+      currentIndex: customSlide,
+      setIndex: setCustomSlide,
       size: "large"
     }
   ];
@@ -673,7 +681,7 @@ const PortfolioSection = () => {
             <motion.div
               key={index}
               className={`group relative rounded-2xl overflow-hidden cursor-pointer ${
-                index === 0 ? 'md:col-span-2 aspect-[16/9]' : 'aspect-square'
+                index === 0 || index === 3 ? 'md:col-span-2 aspect-[16/9]' : 'aspect-square'
               }`}
             >
               {item.isCarousel ? (
@@ -739,147 +747,6 @@ const PortfolioSection = () => {
     </section>
   );
 };
-
-
-  /*return (
-    <section id="portfolio" className="py-24 md:py-32 relative" data-testid="portfolio-section">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-20"
-        >
-          <span className="inline-flex items-center gap-2 font-mono text-xs text-roshka-gold tracking-[0.3em] uppercase mb-4 px-4 py-2 rounded-full border border-roshka-gold/20 bg-roshka-gold/5">
-            <Award size={12} />
-            Our Work
-          </span>
-          <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-roshka-text mb-6">
-            <span className="text-gold-gradient">Portfolio</span>
-          </h2>
-          <p className="font-body text-roshka-text-secondary max-w-2xl mx-auto text-lg">
-            Explore our latest projects. Your project could be featured here next.
-          </p>
-        </motion.div>
-
-       }
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {portfolioItems.map((item, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`group relative rounded-2xl overflow-hidden cursor-pointer ${
-                index === 0 ? 'md:col-span-2 aspect-[16/9]' : 
-                index === 3 ? 'lg:col-span-2 aspect-[16/9]' : 
-                'aspect-square'
-              }`}
-              data-testid={`portfolio-item-${index}`}
-            >
-              }
-              {item.isCarousel ? (
-                <>
-                  <AnimatePresence mode="wait">
-                    <motion.img
-                      key={businessSlide}
-                      src={businessImages[businessSlide]}
-                      alt={item.title}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.5 }}
-                      className="w-full h-full object-cover absolute inset-0"
-                    />
-                  </AnimatePresence>
-                  
-                }
-                  <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-                    {businessImages.map((_, imgIndex) => (
-                      <button
-                        key={imgIndex}
-                        onClick={(e) => { e.stopPropagation(); setBusinessSlide(imgIndex); }}
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                          businessSlide === imgIndex 
-                            ? 'bg-roshka-gold w-6' 
-                            : 'bg-white/50 hover:bg-white/80'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  
-                }
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setBusinessSlide((prev) => (prev - 1 + businessImages.length) % businessImages.length); }}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-roshka-bg/60 backdrop-blur-sm flex items-center justify-center text-roshka-gold hover:bg-roshka-gold hover:text-roshka-bg transition-all z-20 opacity-0 group-hover:opacity-100"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setBusinessSlide((prev) => (prev + 1) % businessImages.length); }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-roshka-bg/60 backdrop-blur-sm flex items-center justify-center text-roshka-gold hover:bg-roshka-gold hover:text-roshka-bg transition-all z-20 opacity-0 group-hover:opacity-100"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
-                  </button>
-                </>
-              ) : (
-                <img 
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-              )}
-              
-             }
-              <div className="absolute inset-0 bg-gradient-to-t from-roshka-bg via-roshka-bg/50 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
-              
-             }
-              <div className="absolute inset-0 p-6 flex flex-col justify-end z-10">
-                <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                  <span className="inline-block font-mono text-xs text-roshka-gold uppercase tracking-wider mb-2 px-3 py-1 rounded-full bg-roshka-gold/20">
-                    {item.category}
-                  </span>
-                  <h3 className="font-heading text-2xl text-roshka-text">
-                    {item.title}
-                  </h3>
-                </div>
-              </div>
-              
-              }
-              <div className="absolute inset-0 border-2 border-roshka-gold/0 group-hover:border-roshka-gold/30 rounded-2xl transition-colors duration-500 z-10" />
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-center mt-16"
-        >
-          <p className="font-body text-roshka-text-secondary mb-6 text-lg">
-            Want your project featured here?
-          </p>
-          <a
-            href="#contact"
-            onClick={(e) => { 
-              e.preventDefault(); 
-              document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="btn-gold inline-flex items-center gap-2"
-            data-testid="portfolio-start-project"
-          >
-            Start Your Project
-            <ArrowRight size={18} />
-          </a>
-        </motion.div>
-      </div>
-    </section>
-  );
-};*/
 
 // Enhanced Process Section
 const ProcessSection = () => {
