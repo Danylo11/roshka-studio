@@ -580,7 +580,8 @@ const PortfolioSection = () => {
     process.env.PUBLIC_URL + "/iron1.png",
     process.env.PUBLIC_URL + "/iron2.png", 
     process.env.PUBLIC_URL + "/iron3.png",
-    process.env.PUBLIC_URL + "/iron14.png"
+    process.env.PUBLIC_URL + "/iron4.png",
+    process.env.PUBLIC_URL + "/iron2.png",
   ]
   
   
