@@ -568,11 +568,11 @@ const PortfolioSection = () => {
   
   // Images for Business Website carousel
   const businessImages = [
-    "/portfolio1.png",
-    "/portfolio2.png", 
-    "/portfolio3.png",
-    "/portfolio4.png",
-    "/portfolio5.png"
+    process.env.PUBLIC_URL + "/portfolio1.png",
+    process.env.PUBLIC_URL + "/portfolio2.png", 
+    process.env.PUBLIC_URL + "/portfolio3.png",
+    process.env.PUBLIC_URL + "/portfolio4.png",
+    process.env.PUBLIC_URL + "/portfolio5.png"
   ]
   
   // Auto-play for Business Website carousel
