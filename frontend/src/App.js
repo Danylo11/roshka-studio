@@ -628,6 +628,8 @@ const PortfolioSection = () => {
       title: "Luxe Lash Studio",
       category: "Business Website",
       isCarousel: true,
+      image: businessImages,
+      currentIndex: businessSlide,
       size: "large"
     },
     
@@ -635,6 +637,8 @@ const PortfolioSection = () => {
       title: "Iron. Block. Deli",
       category: "E-commerce",
       isCarousel: true,
+      image: ecommerceImages,
+      currentIndex: ecommerceSlide,
       size: "small"
     },
     {
