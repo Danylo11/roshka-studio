@@ -762,7 +762,7 @@ const PortfolioSection = () => {
           </p>
         </motion.div>
 
-        {/* Bento Grid Layout */}
+       }
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {portfolioItems.map((item, index) => (
             <motion.div
@@ -778,7 +778,7 @@ const PortfolioSection = () => {
               }`}
               data-testid={`portfolio-item-${index}`}
             >
-              {/* Business Website with Carousel */}
+              }
               {item.isCarousel ? (
                 <>
                   <AnimatePresence mode="wait">
@@ -794,7 +794,7 @@ const PortfolioSection = () => {
                     />
                   </AnimatePresence>
                   
-                  {/* Carousel Navigation */}
+                }
                   <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2 z-20">
                     {businessImages.map((_, imgIndex) => (
                       <button
@@ -809,7 +809,7 @@ const PortfolioSection = () => {
                     ))}
                   </div>
                   
-                  {/* Arrow buttons */}
+                }
                   <button
                     onClick={(e) => { e.stopPropagation(); setBusinessSlide((prev) => (prev - 1 + businessImages.length) % businessImages.length); }}
                     className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-roshka-bg/60 backdrop-blur-sm flex items-center justify-center text-roshka-gold hover:bg-roshka-gold hover:text-roshka-bg transition-all z-20 opacity-0 group-hover:opacity-100"
@@ -831,10 +831,10 @@ const PortfolioSection = () => {
                 />
               )}
               
-              {/* Overlay */}
+             }
               <div className="absolute inset-0 bg-gradient-to-t from-roshka-bg via-roshka-bg/50 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
               
-              {/* Content */}
+             }
               <div className="absolute inset-0 p-6 flex flex-col justify-end z-10">
                 <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                   <span className="inline-block font-mono text-xs text-roshka-gold uppercase tracking-wider mb-2 px-3 py-1 rounded-full bg-roshka-gold/20">
@@ -846,7 +846,7 @@ const PortfolioSection = () => {
                 </div>
               </div>
               
-              {/* Hover border */}
+              }
               <div className="absolute inset-0 border-2 border-roshka-gold/0 group-hover:border-roshka-gold/30 rounded-2xl transition-colors duration-500 z-10" />
             </motion.div>
           ))}
