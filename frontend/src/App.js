@@ -570,7 +570,9 @@ const PortfolioSection = () => {
   const businessImages = [
     "/portfolio1.png",
     "/portfolio2.png", 
-    "/portfolio3.png"
+    "/portfolio3.png",
+    "/portfolio4.png",
+    "/portfolio5.png"
   ]
   
   // Auto-play for Business Website carousel
