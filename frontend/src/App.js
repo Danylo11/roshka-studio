@@ -565,6 +565,7 @@ const AboutSection = () => {
 // Portfolio Section with Carousel for Business Website
 const PortfolioSection = () => {
   const [businessSlide, setBusinessSlide] = useState(0);
+  const [ecommerceSlide, setEcommerceSlide] = useState(0);
   
   // Images for Business Website carousel
   const businessImages = [
@@ -573,7 +574,15 @@ const PortfolioSection = () => {
     process.env.PUBLIC_URL + "/portfolio3.png",
     process.env.PUBLIC_URL + "/portfolio4.png",
     process.env.PUBLIC_URL + "/portfolio5.png"
+  ];
+  
+  const businessImages = [
+    process.env.PUBLIC_URL + "/iron1.png",
+    process.env.PUBLIC_URL + "/iron2.png", 
+    process.env.PUBLIC_URL + "/iron3.png",
+    process.env.PUBLIC_URL + "/iron14.png"
   ]
+  
   
   // Auto-play for Business Website carousel
   useEffect(() => {
@@ -584,8 +593,16 @@ const PortfolioSection = () => {
   }, [businessImages.length]);
 
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setEcommerceSlide((prev) => (prev + 1) % ecommerceImages.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [ecommerceImages.length]);
 
-//
+
+
+/*
 const PortfolioSection = () => {
   const [EcommerceSlide, setEcommerceSlide] = useState(0);
   
@@ -603,7 +620,7 @@ const PortfolioSection = () => {
       setEcommerceSlide((prev) => (prev + 1) % EcommerceImages.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, [EcommerceImages.length]);
+  }, [EcommerceImages.length]);*/
   
   
   const portfolioItems = [
