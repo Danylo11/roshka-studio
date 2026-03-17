@@ -907,7 +907,7 @@ const ContactSection = () => {
 
             <div className="space-y-6">
               <motion.a 
-                href="mailto:ogrisko54@gmail.com"
+                href="mailto:roshkastudio@gmail.com"
                 className="flex items-center gap-4 group"
                 whileHover={{ x: 5 }}
                 data-testid="contact-email"
@@ -918,7 +918,7 @@ const ContactSection = () => {
                 <div>
                   <div className="font-body text-sm text-roshka-text-secondary mb-1">Email</div>
                   <span className="font-body text-lg text-roshka-text group-hover:text-roshka-gold transition-colors">
-                    ogrisko54@gmail.com
+                    roshkastudio@gmail.com
                   </span>
                 </div>
               </motion.a>
@@ -1135,7 +1135,7 @@ const Footer = () => {
               <Github size={20} className="text-roshka-gold" />
             </a>
             <a 
-              href="mailto:ogrisko54@gmail.com"
+              href="mailto:roshkastudio@gmail.com"
               className="w-12 h-12 rounded-full bg-roshka-gold/10 flex items-center justify-center hover:bg-roshka-gold/20 transition-colors"
               data-testid="footer-email"
               aria-label="Email"
