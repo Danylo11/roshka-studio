@@ -34,7 +34,7 @@ SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID', '')
 
 # Resend API configuration
 RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
-NOTIFICATION_EMAIL = os.environ.get('NOTIFICATION_EMAIL', 'ogrisko54@gmail.com')
+NOTIFICATION_EMAIL = os.environ.get('NOTIFICATION_EMAIL', 'roshkastudio@gmail.com')
 
 # Configure logging
 logging.basicConfig(
@@ -278,7 +278,7 @@ async def send_thank_you_email(inquiry: Inquiry):
                 </p>
                 
                 <div style="text-align: center; margin: 35px 0;">
-                    <a href="mailto:ogrisko54@gmail.com" style="display: inline-block; background: linear-gradient(135deg, #D4AF37 0%, #F6E27A 50%, #B8860B 100%); color: #050505; padding: 15px 35px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Contact Us Directly</a>
+                    <a href="mailto:roshkastudio@gmail.com" style="display: inline-block; background: linear-gradient(135deg, #D4AF37 0%, #F6E27A 50%, #B8860B 100%); color: #050505; padding: 15px 35px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Contact Us Directly</a>
                 </div>
                 
                 <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0 20px;">
@@ -287,7 +287,7 @@ async def send_thank_you_email(inquiry: Inquiry):
                     ROSHKA STUDIO | Silver Spring, MD
                 </p>
                 <p style="text-align: center; color: #A3A3A3; font-size: 12px; margin-bottom: 0;">
-                    ogrisko54@gmail.com
+                    roshkastudio@gmail.com
                 </p>
             </div>
         </body>
